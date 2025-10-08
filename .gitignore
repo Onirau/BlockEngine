@@ -1,3 +1,6 @@
+# Test
+lua/
+
 # Build
 build/*
 !build/.gitkeep
