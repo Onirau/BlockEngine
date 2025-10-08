@@ -1,17 +1,15 @@
 #include "Instance.h"
 
-std::vector<BasePart *> g_instances;
+std::vector<BasePart*> g_instances;
 
-static int Instance_new(lua_State *L)
-{
-    const char *className = luaL_checkstring(L, 1);
+static int Instance_new(lua_State* L) {
+    const char* className = luaL_checkstring(L, 1);
 
-    if (strcmp(className, "Part") == 0)
-    {
-        Part *p = new Part();
+    if (strcmp(className, "Part") == 0) {
+        Part* p = new Part();
         g_instances.push_back(p);
 
-        Part **udata = (Part **)lua_newuserdata(L, sizeof(Part *));
+        Part** udata = (Part**)lua_newuserdata(L, sizeof(Part*));
         *udata = p;
 
         luaL_getmetatable(L, "PartMeta");
@@ -25,13 +23,11 @@ static int Instance_new(lua_State *L)
     return 0;
 }
 
-static int Instance_gc(lua_State *L)
-{
+static int Instance_gc(lua_State* L) {
     return 0;
 }
 
-void Instance_Bind(lua_State *L)
-{
+void Instance_Bind(lua_State* L) {
     lua_newtable(L);
 
     lua_pushcfunction(L, Instance_new, "new");
