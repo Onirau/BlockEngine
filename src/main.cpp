@@ -93,12 +93,12 @@ int main(int argc, char** argv) {
     g_camera.position = {0, 2, -5};
     g_camera.target = {0, 2, 0};
 
-    Part baseplate{};
-    baseplate.Color = Color3(Color{92, 92, 92, 0});
-    baseplate.Position = Vector3Game{0, -8, 0};
-    baseplate.Size = Vector3Game{2048, 16, 2048};
+    Part* baseplate = new Part();
+    baseplate->Color = Color3(Color{92, 92, 92, 0});
+    baseplate->Position = Vector3Game{0, -8, 0};
+    baseplate->Size = Vector3Game{2048, 16, 2048};
 
-    g_instances.push_back(&baseplate);
+    g_instances.push_back(baseplate);
 
     LoadSkybox();
 
