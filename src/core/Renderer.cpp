@@ -10,8 +10,7 @@ static Color Color3ToColor(const Color3& c) {
         (unsigned char)roundf(c.r * 255.0f),
         (unsigned char)roundf(c.g * 255.0f),
         (unsigned char)roundf(c.b * 255.0f),
-        255
-    };
+        255};
 }
 
 Texture2D GenerateDefaultTexture(int width, int height) {
@@ -20,7 +19,7 @@ Texture2D GenerateDefaultTexture(int width, int height) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             unsigned char n = (unsigned char)(rand() % 16 + 239);
-            Color c = { n, n, n, 255 };
+            Color c = {n, n, n, 255};
             ImageDrawPixel(&img, x, y, c);
         }
     }

@@ -64,12 +64,12 @@ void TaskScheduler_Step() {
 
         if (now >= task.WakeTime) {
             double elapsed = now - task.SleepStartTime;
-            lua_pushnumber(task.thread, elapsed); // return value of task.wait()
+            lua_pushnumber(task.thread, elapsed);//return value of task.wait()
 
             int status = lua_resume(task.thread, nullptr, 1);
 
             if (status == LUA_YIELD) {
-                // will be resumed later
+                //will be resumed later
             } else if (status == LUA_OK) {
                 task.Finished = true;
             } else {
@@ -81,19 +81,18 @@ void TaskScheduler_Step() {
     }
 
     g_tasks.erase(std::remove_if(g_tasks.begin(), g_tasks.end(),
-            [](const LuaTask& t){ return t.Finished; }),
-            g_tasks.end());
+                                 [](const LuaTask& t) { return t.Finished; }),
+                  g_tasks.end());
 }
-
-
 
 
 void Task_Bind(lua_State* L) {
     lua_newtable(L);
 
-    lua_pushcfunction(L, Task_Spawn, "spawn"); lua_setfield(L, -2, "spawn");
-    lua_pushcfunction(L, Task_Wait, "wait"); lua_setfield(L, -2, "wait");
+    lua_pushcfunction(L, Task_Spawn, "spawn");
+    lua_setfield(L, -2, "spawn");
+    lua_pushcfunction(L, Task_Wait, "wait");
+    lua_setfield(L, -2, "wait");
 
     lua_setglobal(L, "task");
 }
-

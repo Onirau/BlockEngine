@@ -12,11 +12,11 @@ struct Part : public BasePart {
     Part();
 
     Part(const std::string& name,
-            const Vector3Game& position,
-            const Vector3Game& size,
-            const Color3& color,
-            bool anchored,
-            std::string shape = "Wedge");
+         const Vector3Game& position,
+         const Vector3Game& size,
+         const Color3& color,
+         bool anchored,
+         std::string shape = "Wedge");
 };
 
 void Part_Bind(lua_State* L);

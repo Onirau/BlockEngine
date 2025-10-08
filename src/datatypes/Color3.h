@@ -10,16 +10,20 @@
 struct Color3 {
     float r, g, b;
 
-    Color3() : r(0), g(0), b(0) {}
+    Color3()
+        : r(0), g(0), b(0) {
+    }
     Color3(float red, float green, float blue)
-    : r(std::clamp(red, 0.0f, 1.0f)),
-    g(std::clamp(green, 0.0f, 1.0f)),
-    b(std::clamp(blue, 0.0f, 1.0f)) {}
+        : r(std::clamp(red, 0.0f, 1.0f)),
+          g(std::clamp(green, 0.0f, 1.0f)),
+          b(std::clamp(blue, 0.0f, 1.0f)) {
+    }
 
     Color3(Color rayColor)
-    : r((float)rayColor.r / 255.f),
-    g((float)rayColor.g / 255.f),
-    b((float)rayColor.b / 255.f) {}
+        : r((float)rayColor.r / 255.f),
+          g((float)rayColor.g / 255.f),
+          b((float)rayColor.b / 255.f) {
+    }
 
     static Color3 fromRGB(int r, int g, int b) {
         return Color3(r / 255.0f, g / 255.0f, b / 255.0f);

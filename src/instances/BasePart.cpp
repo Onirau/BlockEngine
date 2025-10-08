@@ -1,9 +1,8 @@
 #include "BasePart.h"
 
-static int BasePart_tostring(lua_State *L)
-{
-    BasePart **ppart = (BasePart **)luaL_checkudata(L, 1, "BasePartMeta");
-    BasePart *part = *ppart;
+static int BasePart_tostring(lua_State* L) {
+    BasePart** ppart = (BasePart**)luaL_checkudata(L, 1, "BasePartMeta");
+    BasePart* part = *ppart;
 
     char buf[256];
     snprintf(buf, sizeof(buf),
@@ -17,11 +16,10 @@ static int BasePart_tostring(lua_State *L)
     return 1;
 }
 
-static int BasePart_index(lua_State *L)
-{
-    BasePart **ppart = (BasePart **)luaL_checkudata(L, 1, "BasePartMeta");
-    BasePart *part = *ppart;
-    const char *key = luaL_checkstring(L, 2);
+static int BasePart_index(lua_State* L) {
+    BasePart** ppart = (BasePart**)luaL_checkudata(L, 1, "BasePartMeta");
+    BasePart* part = *ppart;
+    const char* key = luaL_checkstring(L, 2);
 
     if (strcmp(key, "Name") == 0)
         lua_pushstring(L, part->Name.c_str());
@@ -33,100 +31,73 @@ static int BasePart_index(lua_State *L)
         lua_pushboolean(L, part->CanCollide);
     else if (strcmp(key, "Transparency") == 0)
         lua_pushnumber(L, part->Transparency);
-    else if (strcmp(key, "Position") == 0)
-    {
-        Vector3Game *v = (Vector3Game *)lua_newuserdata(L, sizeof(Vector3Game));
+    else if (strcmp(key, "Position") == 0) {
+        Vector3Game* v = (Vector3Game*)lua_newuserdata(L, sizeof(Vector3Game));
         *v = part->Position;
         luaL_getmetatable(L, "Vector3Meta");
         lua_setmetatable(L, -2);
-    }
-    else if (strcmp(key, "Rotation") == 0)
-    {
-        Vector3Game *v = (Vector3Game *)lua_newuserdata(L, sizeof(Vector3Game));
+    } else if (strcmp(key, "Rotation") == 0) {
+        Vector3Game* v = (Vector3Game*)lua_newuserdata(L, sizeof(Vector3Game));
         *v = part->Rotation;
         luaL_getmetatable(L, "Vector3Meta");
         lua_setmetatable(L, -2);
-    }
-    else if (strcmp(key, "Size") == 0)
-    {
-        Vector3Game *v = (Vector3Game *)lua_newuserdata(L, sizeof(Vector3Game));
+    } else if (strcmp(key, "Size") == 0) {
+        Vector3Game* v = (Vector3Game*)lua_newuserdata(L, sizeof(Vector3Game));
         *v = part->Size;
         luaL_getmetatable(L, "Vector3Meta");
         lua_setmetatable(L, -2);
-    }
-    else if (strcmp(key, "Color") == 0)
-    {
-        Color3 *c = (Color3 *)lua_newuserdata(L, sizeof(Color3));
+    } else if (strcmp(key, "Color") == 0) {
+        Color3* c = (Color3*)lua_newuserdata(L, sizeof(Color3));
         *c = part->Color;
         luaL_getmetatable(L, "Color3Meta");
         lua_setmetatable(L, -2);
-    }
-    else
+    } else
         lua_pushnil(L);
 
     return 1;
 }
 
-static int BasePart_newindex(lua_State *L)
-{
-    BasePart **ppart = (BasePart **)luaL_checkudata(L, 1, "BasePartMeta");
-    BasePart *part = *ppart;
-    const char *key = luaL_checkstring(L, 2);
+static int BasePart_newindex(lua_State* L) {
+    BasePart** ppart = (BasePart**)luaL_checkudata(L, 1, "BasePartMeta");
+    BasePart* part = *ppart;
+    const char* key = luaL_checkstring(L, 2);
 
-    if (strcmp(key, "Name") == 0)
-    {
+    if (strcmp(key, "Name") == 0) {
         part->Name = luaL_checkstring(L, 3);
-    }
-    else if (strcmp(key, "Anchored") == 0)
-    {
+    } else if (strcmp(key, "Anchored") == 0) {
         part->Anchored = lua_toboolean(L, 3);
-    }
-    else if (strcmp(key, "Transparency") == 0)
-    {
+    } else if (strcmp(key, "Transparency") == 0) {
         part->Transparency = (float)luaL_checknumber(L, 3);
-    }
-    else if (strcmp(key, "Position") == 0)
-    {
-        Vector3Game *v = (Vector3Game *)luaL_checkudata(L, 3, "Vector3Meta");
+    } else if (strcmp(key, "Position") == 0) {
+        Vector3Game* v = (Vector3Game*)luaL_checkudata(L, 3, "Vector3Meta");
         part->Position = *v;
-    }
-    else if (strcmp(key, "Rotation") == 0)
-    {
-        Vector3Game *v = (Vector3Game *)luaL_checkudata(L, 3, "Vector3Meta");
+    } else if (strcmp(key, "Rotation") == 0) {
+        Vector3Game* v = (Vector3Game*)luaL_checkudata(L, 3, "Vector3Meta");
         part->Rotation = *v;
-    }
-    else if (strcmp(key, "Size") == 0)
-    {
-        Vector3Game *v = (Vector3Game *)luaL_checkudata(L, 3, "Vector3Meta");
+    } else if (strcmp(key, "Size") == 0) {
+        Vector3Game* v = (Vector3Game*)luaL_checkudata(L, 3, "Vector3Meta");
         part->Size = *v;
-    }
-    else if (strcmp(key, "Color") == 0)
-    {
-        Color3 *c = (Color3 *)luaL_checkudata(L, 3, "Color3Meta");
+    } else if (strcmp(key, "Color") == 0) {
+        Color3* c = (Color3*)luaL_checkudata(L, 3, "Color3Meta");
         part->Color = *c;
     }
 
     return 0;
 }
 
-static int BasePart_gc(lua_State *L)
-{
+static int BasePart_gc(lua_State* L) {
     return 0;
 }
 
-void BasePart_Bind(lua_State *L)
-{
+void BasePart_Bind(lua_State* L) {
     luaL_newmetatable(L, "BasePartMeta");
 
     lua_pushcfunction(L, BasePart_index, "__index");
     lua_setfield(L, -2, "__index");
-
     lua_pushcfunction(L, BasePart_newindex, "__newindex");
     lua_setfield(L, -2, "__newindex");
-
     lua_pushcfunction(L, BasePart_tostring, "__tostring");
     lua_setfield(L, -2, "__tostring");
-
     lua_pushcfunction(L, BasePart_gc, "__gc");
     lua_setfield(L, -2, "__gc");
 

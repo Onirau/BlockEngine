@@ -1,9 +1,11 @@
 #include "Object.h"
 
 Object::Object(const std::string& className)
-: ClassName(className), Name(className) {}
+    : ClassName(className), Name(className) {
+}
 
-Object::~Object() {}
+Object::~Object() {
+}
 
 bool Object::IsA(const std::string& className) const {
     return this->ClassName == className;

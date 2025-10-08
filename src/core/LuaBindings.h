@@ -20,11 +20,11 @@
 #include "raymath.h"
 
 namespace LuaBindings {
-    extern std::vector<BasePart*>* g_instances;
-    extern Camera3D* gg_camera;
+extern std::vector<BasePart*>* g_instances;
+extern Camera3D* gg_camera;
 
-    int Lua_SpawnPart(lua_State* L);
-    int Lua_SetCameraPos(lua_State* L);
+int Lua_SpawnPart(lua_State* L);
+int Lua_SetCameraPos(lua_State* L);
 
-    void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3D& g_camera);
-}
+void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3D& g_camera);
+}//namespace LuaBindings

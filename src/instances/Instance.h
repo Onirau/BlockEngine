@@ -15,7 +15,7 @@ struct Attribute {
     std::variant<bool, double, std::string, Vector3Game, Color3> Value;
 };
 
-struct Instance :public Object {
+struct Instance : public Object {
     //-- Properties --//
     Instance* Parent = nullptr;
     std::vector<Instance*> Children;
@@ -38,7 +38,7 @@ struct Instance :public Object {
     virtual ~Instance();
 
     void AddTag(std::string& tag);
-    // GetTags();
+    //GetTags();
     bool HasTag(std::string& tag);
     void RemoveTag(std::string& tag);
 
@@ -62,7 +62,7 @@ struct Instance :public Object {
 
     void ClearAllChildren();
     void Destroy();
-    // Clone();
+    //Clone();
 
     void SetParent(Instance* newParent);
     void AddChild(Instance* child);

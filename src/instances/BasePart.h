@@ -29,10 +29,10 @@ struct BasePart : public Instance {
     bool CanTouch = true;
     double Mass;
 
-    Color3 Color = Color3{163.f/255, 162.f/255, 165.f/255};
+    Color3 Color = Color3{163.f / 255, 162.f / 255, 165.f / 255};
     bool CastShadow = true;
     float Transparency = 0;
-    // Material
+    //Material
 
     //-- Events --//
     Signal Touched;
@@ -46,6 +46,6 @@ struct BasePart : public Instance {
     double GetMass();
 };
 
-// Binding
+//Binding
 
 void BasePart_Bind(lua_State* L);

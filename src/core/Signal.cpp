@@ -13,12 +13,13 @@ void Signal::ConnectCpp(const std::function<void()>& cb) {
 }
 
 void Signal::Fire() {
-    for (auto& cb : CppConnections) cb();
+    for (auto& cb : CppConnections)
+        cb();
 
     if (!L) return;
     for (int ref : LuaConnections) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-        lua_pushnil(L); // no arguments
+        lua_pushnil(L);//no arguments
         if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
             printf("Signal Lua error: %s\n", lua_tostring(L, -1));
             lua_pop(L, 1);
@@ -27,7 +28,8 @@ void Signal::Fire() {
 }
 
 void Signal::Fire(const std::string& s) {
-    for (auto& cb : CppConnections) cb();
+    for (auto& cb : CppConnections)
+        cb();
 
     if (!L) return;
     for (int ref : LuaConnections) {
@@ -41,7 +43,8 @@ void Signal::Fire(const std::string& s) {
 }
 
 void Signal::Fire(double n) {
-    for (auto& cb : CppConnections) cb();
+    for (auto& cb : CppConnections)
+        cb();
 
     if (!L) return;
     for (int ref : LuaConnections) {
@@ -55,7 +58,8 @@ void Signal::Fire(double n) {
 }
 
 void Signal::Fire(bool b) {
-    for (auto& cb : CppConnections) cb();
+    for (auto& cb : CppConnections)
+        cb();
 
     if (!L) return;
     for (int ref : LuaConnections) {
@@ -69,7 +73,8 @@ void Signal::Fire(bool b) {
 }
 
 void Signal::Fire(Instance* inst) {
-    for (auto& cb : CppConnections) cb();
+    for (auto& cb : CppConnections)
+        cb();
 
     if (!L) return;
     for (int ref : LuaConnections) {
@@ -83,10 +88,10 @@ void Signal::Fire(Instance* inst) {
 }
 
 void Signal::DisconnectAll() {
-  for (int ref : LuaConnections)
-    if (L)
-      lua_unref(L, ref);
+    for (int ref : LuaConnections)
+        if (L)
+            lua_unref(L, ref);
 
-  LuaConnections.clear();
-  CppConnections.clear();
+    LuaConnections.clear();
+    CppConnections.clear();
 }
