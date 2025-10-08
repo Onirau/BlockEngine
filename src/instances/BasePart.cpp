@@ -84,9 +84,12 @@ static int BasePart_newindex(lua_State* L) {
 void BasePart_Bind(lua_State* L) {
     luaL_newmetatable(L, "BasePartMeta");
 
-    lua_pushcfunction(L, BasePart_index, "__index"); lua_setfield(L, -2, "__index");
-    lua_pushcfunction(L, BasePart_newindex, "__newindex"); lua_setfield(L, -2, "__newindex");
-    lua_pushcfunction(L, BasePart_tostring, "__tostring"); lua_setfield(L, -2, "__tostring");
+    lua_pushcfunction(L, BasePart_index, "__index");
+    lua_setfield(L, -2, "__index");
+    lua_pushcfunction(L, BasePart_newindex, "__newindex");
+    lua_setfield(L, -2, "__newindex");
+    lua_pushcfunction(L, BasePart_tostring, "__tostring");
+    lua_setfield(L, -2, "__tostring");
 
     lua_pop(L, 1);
 }

@@ -12,8 +12,8 @@ void SetMeshTextureCoords(Mesh* mesh, const Vector2* texcoords) {
         mesh->texcoords = (float*)RL_CALLOC(mesh->vertexCount * 2, sizeof(float));
 
     for (unsigned int i = 0; i < mesh->vertexCount; i++) {
-        mesh->texcoords[i*2 + 0] = texcoords[i].x;
-        mesh->texcoords[i*2 + 1] = texcoords[i].y;
+        mesh->texcoords[i * 2 + 0] = texcoords[i].x;
+        mesh->texcoords[i * 2 + 1] = texcoords[i].y;
     }
 }
 
@@ -21,60 +21,69 @@ static Mesh GenMeshWedge() {
     Mesh mesh = {0};
 
     Vector3 vertices[] = {
-        // bottom
+        //bottom
         {-0.5, -0.5, -0.5},
         {0.5, -0.5, -0.5},
         {-0.5, -0.5, 0.5},
         {0.5, -0.5, 0.5},
 
-        // top
+        //top
         {-0.5, 0.5, -0.5},
-        {0.5, 0.5, -0.5}
-    };
+        {0.5, 0.5, -0.5}};
 
-    // TODO: correct UV's on back, left, and right faces
+    //TODO: correct UV's on back, left, and right faces
     Vector2 uv[] = {
-        // bottom face
-        {0,0}, {1,0}, {0,1}, {1,1},
-        // top face
-        {0,0}, {1,0}, {0,1}, {1,0}, {1,1}, {0,1},
-        // left face
-        {0,0}, {1,0}, {0,1},
-        // right face
-        {0,0}, {1,0}, {0,1}
-    };
+        //bottom face
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 1},
+        //top face
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 0},
+        {1, 1},
+        {0, 1},
+        //left face
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        //right face
+        {0, 0},
+        {1, 0},
+        {0, 1}};
 
     unsigned short indices[] = {
-        // bottom square
+        //bottom square
         0, 1, 2,
         1, 3, 2,
 
-        // back square
+        //back square
         0, 4, 5,
         1, 0, 5,
 
-        // left & right triangles
+        //left & right triangles
         0, 2, 4,
         1, 5, 3,
 
-        // top face
+        //top face
         4, 2, 5,
-        5, 2, 3
-    };
+        5, 2, 3};
 
     mesh.vertexCount = 6;
     mesh.triangleCount = 8;
-    mesh.vertices = (float*)MemAlloc(mesh.vertexCount*3*sizeof(float));
-    for(int i=0;i<mesh.vertexCount;i++){
-        mesh.vertices[i*3+0] = vertices[i].x;
-        mesh.vertices[i*3+1] = vertices[i].y;
-        mesh.vertices[i*3+2] = vertices[i].z;
+    mesh.vertices = (float*)MemAlloc(mesh.vertexCount * 3 * sizeof(float));
+    for (int i = 0; i < mesh.vertexCount; i++) {
+        mesh.vertices[i * 3 + 0] = vertices[i].x;
+        mesh.vertices[i * 3 + 1] = vertices[i].y;
+        mesh.vertices[i * 3 + 2] = vertices[i].z;
     }
 
     SetMeshTextureCoords(&mesh, uv);
 
-    mesh.indices = (unsigned short*)MemAlloc(mesh.triangleCount*3*sizeof(unsigned short));
-    memcpy(mesh.indices, indices, mesh.triangleCount*3*sizeof(unsigned short));
+    mesh.indices = (unsigned short*)MemAlloc(mesh.triangleCount * 3 * sizeof(unsigned short));
+    memcpy(mesh.indices, indices, mesh.triangleCount * 3 * sizeof(unsigned short));
 
     UploadMesh(&mesh, true);
     return mesh;
@@ -84,41 +93,39 @@ static Mesh GenMeshCornerWedge() {
     Mesh mesh = {0};
 
     Vector3 vertices[] = {
-        // bottom square
+        //bottom square
         {-0.5, -0.5, -0.5},
-        { 0.5, -0.5, -0.5},
-        {-0.5, -0.5,  0.5},
-        { 0.5, -0.5,  0.5},
+        {0.5, -0.5, -0.5},
+        {-0.5, -0.5, 0.5},
+        {0.5, -0.5, 0.5},
 
-        // top vertex
-        {-0.5, 0.5, 0.5}
-    };
+        //top vertex
+        {-0.5, 0.5, 0.5}};
 
     unsigned short indices[] = {
-        // bottom square
+        //bottom square
         0, 1, 2,
         1, 3, 2,
 
-        // right & front triangle
+        //right & front triangle
         0, 2, 4,
         4, 2, 3,
 
-        // back & left triangle
+        //back & left triangle
         1, 0, 4,
-        1, 4, 3
-    };
+        1, 4, 3};
 
     mesh.vertexCount = 5;
     mesh.triangleCount = 6;
-    mesh.vertices = (float*)MemAlloc(mesh.vertexCount*3*sizeof(float));
-    for(int i=0;i<mesh.vertexCount;i++){
-        mesh.vertices[i*3+0] = vertices[i].x;
-        mesh.vertices[i*3+1] = vertices[i].y;
-        mesh.vertices[i*3+2] = vertices[i].z;
+    mesh.vertices = (float*)MemAlloc(mesh.vertexCount * 3 * sizeof(float));
+    for (int i = 0; i < mesh.vertexCount; i++) {
+        mesh.vertices[i * 3 + 0] = vertices[i].x;
+        mesh.vertices[i * 3 + 1] = vertices[i].y;
+        mesh.vertices[i * 3 + 2] = vertices[i].z;
     }
 
-    mesh.indices = (unsigned short*)MemAlloc(mesh.triangleCount*3*sizeof(unsigned short));
-    memcpy(mesh.indices, indices, mesh.triangleCount*3*sizeof(unsigned short));
+    mesh.indices = (unsigned short*)MemAlloc(mesh.triangleCount * 3 * sizeof(unsigned short));
+    memcpy(mesh.indices, indices, mesh.triangleCount * 3 * sizeof(unsigned short));
 
     UploadMesh(&mesh, true);
     return mesh;

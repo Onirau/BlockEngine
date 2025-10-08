@@ -19,12 +19,13 @@ struct LuaTask {
     bool Finished = false;
 
     LuaTask(lua_State* L)
-    : thread(lua_newthread(L)) {}
+        : thread(lua_newthread(L)) {
+    }
 };
 
 struct SleepingTask {
     lua_State* thread;
-    double wakeTime; // in seconds
+    double wakeTime;//in seconds
 };
 
 extern std::vector<LuaTask> g_tasks;

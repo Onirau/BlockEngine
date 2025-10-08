@@ -126,11 +126,11 @@ int main(int argc, char** argv) {
         if (rotatingCamera) {
             if (!warpThisFrame) {
                 Vector2 delta = Vector2Subtract(GetMousePosition(), anchorPos);
-                gYaw   += delta.x * 0.004f;
+                gYaw += delta.x * 0.004f;
                 gPitch += -delta.y * 0.004f;
 
-                const float limit = PI/2 - 0.01f;
-                if (gPitch > limit)  gPitch = limit;
+                const float limit = PI / 2 - 0.01f;
+                if (gPitch > limit) gPitch = limit;
                 if (gPitch < -limit) gPitch = -limit;
             } else {
                 SetMousePosition((int)anchorPos.x, (int)anchorPos.y);
@@ -142,11 +142,10 @@ int main(int argc, char** argv) {
         Vector3 forward = {
             cosf(gPitch) * cosf(gYaw),
             sinf(gPitch),
-            cosf(gPitch) * sinf(gYaw)
-        };
+            cosf(gPitch) * sinf(gYaw)};
 
         Vector3 right = Vector3CrossProduct(worldUp, forward);
-        if (Vector3LengthSqr(right) < 1e-6f) right = Vector3{1,0,0};
+        if (Vector3LengthSqr(right) < 1e-6f) right = Vector3{1, 0, 0};
         right = Vector3Normalize(right);
 
         Vector3 up = Vector3CrossProduct(forward, right);
@@ -154,8 +153,8 @@ int main(int argc, char** argv) {
         Vector3 delta = {0, 0, 0};
         if (IsKeyDown(KEY_W)) delta = Vector3Add(delta, Vector3Scale(forward, moveSpeed));
         if (IsKeyDown(KEY_S)) delta = Vector3Subtract(delta, Vector3Scale(forward, moveSpeed));
-        if (IsKeyDown(KEY_D)) delta = Vector3Subtract(delta, Vector3Scale(right,   moveSpeed));
-        if (IsKeyDown(KEY_A)) delta = Vector3Add(delta, Vector3Scale(right,   moveSpeed));
+        if (IsKeyDown(KEY_D)) delta = Vector3Subtract(delta, Vector3Scale(right, moveSpeed));
+        if (IsKeyDown(KEY_A)) delta = Vector3Add(delta, Vector3Scale(right, moveSpeed));
         if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_E)) delta = Vector3Add(delta, Vector3Scale(up, moveSpeed));
         if (IsKeyDown(KEY_Q)) delta = Vector3Subtract(delta, Vector3Scale(up, moveSpeed));
 

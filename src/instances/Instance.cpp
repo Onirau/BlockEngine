@@ -1,6 +1,8 @@
 #include "Instance.h"
 
-Instance::Instance(const std::string& className): Object(className), Name(className) {}
+Instance::Instance(const std::string& className)
+    : Object(className), Name(className) {
+}
 
 Instance::~Instance() {
     Destroy();
@@ -37,16 +39,16 @@ std::vector<Attribute> Instance::GetAttributes() {
 //------ Tags ------//
 
 void Instance::AddTag(std::string& tag) {
-    // TODO: implement tags
+    //TODO: implement tags
 }
 
 bool Instance::HasTag(std::string& tag) {
-    // TODO: implement tag lookup
+    //TODO: implement tag lookup
     return false;
 }
 
 void Instance::RemoveTag(std::string& tag) {
-    // TODO: implement tag removal
+    //TODO: implement tag removal
 }
 
 //------ Tags ------//

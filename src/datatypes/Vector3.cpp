@@ -210,23 +210,37 @@ void Vector3Game_Bind(lua_State* L) {
         lua_setfield(L, -2, name);
     };
 
-    luaL_newmetatable(L, "Vector3Meta"); // Stack: [Vector3, mt]
-    lua_pushcfunction(L, Vector3_index, "__index"); lua_setfield(L, -2, "__index");
-    lua_pushcfunction(L, Vector3_tostring, "__tostring"); lua_setfield(L, -2, "__tostring");
-    lua_pushcfunction(L, Vector3_add, "__add"); lua_setfield(L, -2, "__add");
-    lua_pushcfunction(L, Vector3_sub, "__sub"); lua_setfield(L, -2, "__sub");
-    lua_pushcfunction(L, Vector3_mul, "__mul"); lua_setfield(L, -2, "__mul");
-    lua_pushcfunction(L, Vector3_div, "__div"); lua_setfield(L, -2, "__div");
-    lua_pushcfunction(L, Vector3_unm, "__unm"); lua_setfield(L, -2, "__unm");
+    luaL_newmetatable(L, "Vector3Meta");//Stack: [Vector3, mt]
+    lua_pushcfunction(L, Vector3_index, "__index");
+    lua_setfield(L, -2, "__index");
+    lua_pushcfunction(L, Vector3_tostring, "__tostring");
+    lua_setfield(L, -2, "__tostring");
+    lua_pushcfunction(L, Vector3_add, "__add");
+    lua_setfield(L, -2, "__add");
+    lua_pushcfunction(L, Vector3_sub, "__sub");
+    lua_setfield(L, -2, "__sub");
+    lua_pushcfunction(L, Vector3_mul, "__mul");
+    lua_setfield(L, -2, "__mul");
+    lua_pushcfunction(L, Vector3_div, "__div");
+    lua_setfield(L, -2, "__div");
+    lua_pushcfunction(L, Vector3_unm, "__unm");
+    lua_setfield(L, -2, "__unm");
 
-    lua_pushcfunction(L, Vector3_abs, "Abs"); lua_setfield(L, -2, "Abs");
-    lua_pushcfunction(L, Vector3_ceil, "Ceil"); lua_setfield(L, -2, "Ceil");
-    lua_pushcfunction(L, Vector3_floor, "Floor"); lua_setfield(L, -2, "Floor");
+    lua_pushcfunction(L, Vector3_abs, "Abs");
+    lua_setfield(L, -2, "Abs");
+    lua_pushcfunction(L, Vector3_ceil, "Ceil");
+    lua_setfield(L, -2, "Ceil");
+    lua_pushcfunction(L, Vector3_floor, "Floor");
+    lua_setfield(L, -2, "Floor");
 
-    lua_pushcfunction(L, Vector3_dot, "Dot"); lua_setfield(L, -2, "Dot");
-    lua_pushcfunction(L, Vector3_cross, "Cross"); lua_setfield(L, -2, "Cross");
-    lua_pushcfunction(L, Vector3_lerp, "Lerp"); lua_setfield(L, -2, "Lerp");
-    lua_pushcfunction(L, Vector3_fuzzyeq, "FuzzyEq"); lua_setfield(L, -2, "FuzzyEq");
+    lua_pushcfunction(L, Vector3_dot, "Dot");
+    lua_setfield(L, -2, "Dot");
+    lua_pushcfunction(L, Vector3_cross, "Cross");
+    lua_setfield(L, -2, "Cross");
+    lua_pushcfunction(L, Vector3_lerp, "Lerp");
+    lua_setfield(L, -2, "Lerp");
+    lua_pushcfunction(L, Vector3_fuzzyeq, "FuzzyEq");
+    lua_setfield(L, -2, "FuzzyEq");
     lua_pop(L, 1);
 
     pushVector3Const("zero", Vector3_zero);
@@ -235,6 +249,7 @@ void Vector3Game_Bind(lua_State* L) {
     pushVector3Const("yAxis", Vector3_yAxis);
     pushVector3Const("zAxis", Vector3_zAxis);
 
-    lua_pushcfunction(L, Vector3_new, "new"); lua_setfield(L, -2, "new");
+    lua_pushcfunction(L, Vector3_new, "new");
+    lua_setfield(L, -2, "new");
     lua_setglobal(L, "Vector3");
 }

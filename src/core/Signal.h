@@ -18,22 +18,24 @@ struct Connection {
     bool Connected = true;
     std::function<void(SignalArg)> Callback;
 
-    void Disconnect() { Connected = false; }
+    void Disconnect() {
+        Connected = false;
+    }
 };
 
 struct Signal {
     lua_State* L = nullptr;
-    std::vector<int> LuaConnections; // LUA registry refs
-    std::vector<std::function<void()>> CppConnections; // optional
+    std::vector<int> LuaConnections;//LUA registry refs
+    std::vector<std::function<void()>> CppConnections;//optional
 
-    // Lua
+    //Lua
     void ConnectLua(lua_State* L, int funcIndex);
 
-    // C++
+    //C++
     void ConnectCpp(const std::function<void()>& cb);
 
-    // Fire
-    void Fire(); // no args
+    //Fire
+    void Fire();//no args
     void Fire(const std::string& s);
     void Fire(double n);
     void Fire(bool b);

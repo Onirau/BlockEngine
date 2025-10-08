@@ -1,6 +1,6 @@
 #include "Color3.h"
 
-// --- Helper methods ---
+//--- Helper methods ---
 Color3 Color3::fromHSV(float h, float s, float v) {
     h = fmodf(h, 1.0f) * 6.0f;
     int i = (int)floorf(h);
@@ -10,12 +10,18 @@ Color3 Color3::fromHSV(float h, float s, float v) {
     float t = v * (1.0f - s * (1.0f - f));
 
     switch (i) {
-        case 0: return Color3(v, t, p);
-        case 1: return Color3(q, v, p);
-        case 2: return Color3(p, v, t);
-        case 3: return Color3(p, q, v);
-        case 4: return Color3(t, p, v);
-        default: return Color3(v, p, q);
+    case 0:
+        return Color3(v, t, p);
+    case 1:
+        return Color3(q, v, p);
+    case 2:
+        return Color3(p, v, t);
+    case 3:
+        return Color3(p, q, v);
+    case 4:
+        return Color3(t, p, v);
+    default:
+        return Color3(v, p, q);
     }
 }
 
@@ -23,9 +29,8 @@ Color3 Color3::Lerp(const Color3& other, float alpha) const {
     alpha = std::clamp(alpha, 0.0f, 1.0f);
     return Color3(
         r + (other.r - r) * alpha,
-                  g + (other.g - g) * alpha,
-                  b + (other.b - b) * alpha
-    );
+        g + (other.g - g) * alpha,
+        b + (other.b - b) * alpha);
 }
 
 static int Color3_new(lua_State* L) {
@@ -123,30 +128,37 @@ static int Color3_eq(lua_State* L) {
     Color3* a = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
     Color3* b = (Color3*)luaL_checkudata(L, 2, "Color3Meta");
 
-    lua_pushboolean(L, std::fabs(a->r - b->r) < 1e-6f &&
-    std::fabs(a->g - b->g) < 1e-6f &&
-    std::fabs(a->b - b->b) < 1e-6f);
+    lua_pushboolean(L, std::fabs(a->r - b->r) < 1e-6f && std::fabs(a->g - b->g) < 1e-6f && std::fabs(a->b - b->b) < 1e-6f);
     return 1;
 }
 
 void Color3_Bind(lua_State* L) {
-    // Metatable
+    //Metatable
     luaL_newmetatable(L, "Color3Meta");
 
-    lua_pushcfunction(L, Color3_tostring, "__tostring"); lua_setfield(L, -2, "__tostring");
-    lua_pushcfunction(L, Color3_add, "__add"); lua_setfield(L, -2, "__add");
-    lua_pushcfunction(L, Color3_mul, "__mul"); lua_setfield(L, -2, "__mul");
-    lua_pushcfunction(L, Color3_eq, "__eq"); lua_setfield(L, -2, "__eq");
+    lua_pushcfunction(L, Color3_tostring, "__tostring");
+    lua_setfield(L, -2, "__tostring");
+    lua_pushcfunction(L, Color3_add, "__add");
+    lua_setfield(L, -2, "__add");
+    lua_pushcfunction(L, Color3_mul, "__mul");
+    lua_setfield(L, -2, "__mul");
+    lua_pushcfunction(L, Color3_eq, "__eq");
+    lua_setfield(L, -2, "__eq");
 
     lua_pop(L, 1);
 
     lua_newtable(L);
 
-    lua_pushcfunction(L, Color3_new, "new"); lua_setfield(L, -2, "new");
-    lua_pushcfunction(L, Color3_fromRGB, "fromRGB"); lua_setfield(L, -2, "fromRGB");
-    lua_pushcfunction(L, Color3_fromHSV, "fromHSV"); lua_setfield(L, -2, "fromHSV");
-    lua_pushcfunction(L, Color3_toRGB, "toRGB"); lua_setfield(L, -2, "toRGB");
-    lua_pushcfunction(L, Color3_lerp, "lerp"); lua_setfield(L, -2, "lerp");
+    lua_pushcfunction(L, Color3_new, "new");
+    lua_setfield(L, -2, "new");
+    lua_pushcfunction(L, Color3_fromRGB, "fromRGB");
+    lua_setfield(L, -2, "fromRGB");
+    lua_pushcfunction(L, Color3_fromHSV, "fromHSV");
+    lua_setfield(L, -2, "fromHSV");
+    lua_pushcfunction(L, Color3_toRGB, "toRGB");
+    lua_setfield(L, -2, "toRGB");
+    lua_pushcfunction(L, Color3_lerp, "lerp");
+    lua_setfield(L, -2, "lerp");
 
     lua_setglobal(L, "Color3");
 }

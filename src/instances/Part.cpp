@@ -1,8 +1,9 @@
 #include "Part.h"
 
-const char* validShapes[] = { "Block", "Sphere", "Cylinder", "Wedge", "CornerWedge", nullptr };
+const char* validShapes[] = {"Block", "Sphere", "Cylinder", "Wedge", "CornerWedge", nullptr};
 
-Part::Part(): BasePart() {
+Part::Part()
+    : BasePart() {
     ClassName = "Part";
     Shape = "Block";
 }
@@ -12,7 +13,8 @@ Part::Part(const std::string& name,
            const Vector3Game& size,
            const Color3& color,
            bool anchored,
-           std::string shape): BasePart() {
+           std::string shape)
+    : BasePart() {
     Name = name;
     Position = position;
     Size = size;
@@ -75,7 +77,7 @@ static int Part_newindex(lua_State* L) {
     if (strcmp(key, "Shape") == 0) {
         const char* newShape = luaL_checkstring(L, 3);
 
-        for (auto shape :validShapes) {
+        for (auto shape : validShapes) {
             if (strcmp(newShape, shape) == 0) {
                 part->Shape = newShape;
                 return 0;
@@ -111,9 +113,10 @@ static int Part_newindex(lua_State* L) {
 void Part_Bind(lua_State* L) {
     luaL_newmetatable(L, "PartMeta");
 
-    lua_pushcfunction(L, Part_index, "__index"); lua_setfield(L, -2, "__index");
-    lua_pushcfunction(L, Part_newindex, "__newindex"); lua_setfield(L, -2, "__newindex");
+    lua_pushcfunction(L, Part_index, "__index");
+    lua_setfield(L, -2, "__index");
+    lua_pushcfunction(L, Part_newindex, "__newindex");
+    lua_setfield(L, -2, "__newindex");
 
     lua_pop(L, 1);
 }
-

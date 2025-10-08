@@ -25,7 +25,8 @@ static int l_Signal_DisconnectAll(lua_State* L) {
 void Lua_RegisterSignal(lua_State* L) {
     luaL_newmetatable(L, "Signal");
 
-    lua_pushcfunction(L, l_Signal_Connect, "Connect"); lua_setfield(L, -2, "Connect");
+    lua_pushcfunction(L, l_Signal_Connect, "Connect");
+    lua_setfield(L, -2, "Connect");
 
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
@@ -35,37 +36,38 @@ void Lua_RegisterSignal(lua_State* L) {
 
 
 namespace LuaBindings {
-    std::vector<BasePart*>* g_instances = nullptr;
-    Camera3D* gg_camera = nullptr;
+std::vector<BasePart*>* g_instances = nullptr;
+Camera3D* gg_camera = nullptr;
 
-    int Lua_SetCameraPos(lua_State* L) {
-        float x = (float)lua_tonumber(L, 1);
-        float y = (float)lua_tonumber(L, 2);
-        float z = (float)lua_tonumber(L, 3);
+int Lua_SetCameraPos(lua_State* L) {
+    float x = (float)lua_tonumber(L, 1);
+    float y = (float)lua_tonumber(L, 2);
+    float z = (float)lua_tonumber(L, 3);
 
-        gg_camera->position = {x, y, z};
+    gg_camera->position = {x, y, z};
 
-        return 0;
-    }
-
-    void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3D& g_camera) {
-        g_instances = &parts;
-        gg_camera = &g_camera;
-
-        lua_newtable(L);
-
-        lua_pushcfunction(L, Lua_SetCameraPos, "SetCameraPos"); lua_setfield(L, -2, "SetCameraPos");
-
-        lua_setglobal(L, "Engine");
-
-        Vector3Game_Bind(L);
-        Color3_Bind(L);
-        Instance_Bind(L);
-        Task_Bind(L);
-
-        BasePart_Bind(L);
-        Part_Bind(L);
-
-        Lua_RegisterSignal(L);
-    }
+    return 0;
 }
+
+void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3D& g_camera) {
+    g_instances = &parts;
+    gg_camera = &g_camera;
+
+    lua_newtable(L);
+
+    lua_pushcfunction(L, Lua_SetCameraPos, "SetCameraPos");
+    lua_setfield(L, -2, "SetCameraPos");
+
+    lua_setglobal(L, "Engine");
+
+    Vector3Game_Bind(L);
+    Color3_Bind(L);
+    Instance_Bind(L);
+    Task_Bind(L);
+
+    BasePart_Bind(L);
+    Part_Bind(L);
+
+    Lua_RegisterSignal(L);
+}
+}//namespace LuaBindings
