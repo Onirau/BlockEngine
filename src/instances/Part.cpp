@@ -26,8 +26,13 @@ Part::Part(const std::string& name,
 
 
 static int Part_index(lua_State* L) {
-    Part* part = (Part*)luaL_checkudata(L, 1, "PartMeta");
+    Part** ppart = (Part**)luaL_checkudata(L, 1, "PartMeta");
+    Part* part = *ppart;
     const char* key = luaL_checkstring(L, 2);
+
+    if (!part) {
+        luaL_error(L, "Part pointer is null or deleted");
+    }
 
     if (strcmp(key, "Shape") == 0) {
         lua_pushstring(L, part->Shape.c_str());
@@ -71,15 +76,21 @@ static int Part_index(lua_State* L) {
 }
 
 static int Part_newindex(lua_State* L) {
-    Part* part = (Part*)luaL_checkudata(L, 1, "PartMeta");
+    Part** ppart = (Part**)luaL_checkudata(L, 1, "PartMeta");
+    Part* part = *ppart;
     const char* key = luaL_checkstring(L, 2);
+    ;
+
+    if (!part) {
+        luaL_error(L, "Part pointer is null");
+    }
 
     if (strcmp(key, "Shape") == 0) {
         const char* newShape = luaL_checkstring(L, 3);
 
         for (auto shape : validShapes) {
             if (strcmp(newShape, shape) == 0) {
-                part->Shape = newShape;
+                part->Shape = std::string(newShape);
                 return 0;
             }
         }
@@ -88,7 +99,7 @@ static int Part_newindex(lua_State* L) {
     }
 
     if (strcmp(key, "Name") == 0) {
-        part->Name = luaL_checkstring(L, 3);
+        part->Name = std::string(luaL_checkstring(L, 3));
     } else if (strcmp(key, "Anchored") == 0) {
         part->Anchored = lua_toboolean(L, 3);
     } else if (strcmp(key, "Transparency") == 0) {
