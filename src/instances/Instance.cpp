@@ -329,8 +329,8 @@ bool Instance::IsA(const std::string& className) const {
 
 static bool inst_user_is_meta(lua_State* L, int idx, const char* meta) {
     if (!lua_isuserdata(L, idx)) return false;
-    if (!lua_getmetatable(L, idx)) return false; // pushes metatable
-    luaL_getmetatable(L, meta); // pushes registered metatable
+    if (!lua_getmetatable(L, idx)) return false;//pushes metatable
+    luaL_getmetatable(L, meta);//pushes registered metatable
     bool eq = lua_rawequal(L, -1, -2);
     lua_pop(L, 2);
     return eq;
@@ -411,7 +411,7 @@ static int l_instance_setParent(lua_State* L) {
 }
 
 static int l_instance_index(lua_State* L) {
-    (void)get_instance_from_any(L, 1); // validate and allow derived types
+    (void)get_instance_from_any(L, 1);//validate and allow derived types
     const char* key = luaL_checkstring(L, 2);
 
     luaL_getmetatable(L, "Instance");
@@ -446,7 +446,7 @@ void Class_Instance_Bind(lua_State* L) {
     lua_pushcfunction(L, l_instance_setName, "__newindex");
     lua_setfield(L, -2, "__newindex");
 
-    // Ensure equality compares underlying C++ pointers
+    //Ensure equality compares underlying C++ pointers
     lua_pushcfunction(L, Lua_UserdataPtrEq, "__eq");
     lua_setfield(L, -2, "__eq");
 

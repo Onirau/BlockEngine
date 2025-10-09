@@ -14,6 +14,7 @@
 #include "../instances/BasePart.h"
 #include "../instances/Part.h"
 #include "../instances/Instance.h"
+#include "../instances/LuaSourceContainer.h"
 
 #include "Signal.h"
 #include "../Global.h"
