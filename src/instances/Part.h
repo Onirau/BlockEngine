@@ -17,6 +17,8 @@ struct Part : public BasePart {
          const Color3& color,
          bool anchored,
          std::string shape = "Wedge");
+
+    virtual bool IsA(const std::string& className) const;
 };
 
 void Part_Bind(lua_State* L);

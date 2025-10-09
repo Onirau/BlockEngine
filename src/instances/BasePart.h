@@ -44,6 +44,7 @@ struct BasePart : public Instance {
     virtual ~BasePart() = default;
 
     double GetMass();
+    virtual bool IsA(const std::string& className) const;
 };
 
 //Binding

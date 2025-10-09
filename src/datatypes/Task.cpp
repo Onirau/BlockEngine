@@ -85,6 +85,30 @@ void TaskScheduler_Step() {
                   g_tasks.end());
 }
 
+//Run until no runnable tasks remain (headless execution helper)
+bool TaskScheduler_RunToIdle() {
+    //Keep stepping until all tasks finished or no progress for a short time
+    //Note: relies on GetTime(), so ensure it advances (in main, raylib is initialized in window mode,
+    //but for headless we still have time via QueryPerformanceCounter under the hood).
+    size_t lastRemaining = SIZE_MAX;
+    int stagnation = 0;
+    for (;;) {
+        size_t remaining = 0;
+        for (const auto& t : g_tasks)
+            if (!t.Finished) ++remaining;
+        if (remaining == 0) return true;
+        if (remaining == lastRemaining) {
+            if (++stagnation > 200) return false;//~200 iterations without progress
+        } else {
+            stagnation = 0;
+            lastRemaining = remaining;
+        }
+        TaskScheduler_Step();
+        //small sleep to avoid busy loop
+        //In headless mode we can spin; omit Sleep to keep it simple
+    }
+}
+
 
 void Task_Bind(lua_State* L) {
     lua_newtable(L);

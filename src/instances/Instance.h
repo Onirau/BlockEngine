@@ -67,4 +67,8 @@ struct Instance : public Object {
     void SetParent(Instance* newParent);
     void AddChild(Instance* child);
     void RemoveChild(Instance* child);
+
+    virtual bool IsA(const std::string& className) const;
 };
+
+void Class_Instance_Bind(lua_State* L);

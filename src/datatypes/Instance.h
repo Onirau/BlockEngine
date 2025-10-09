@@ -10,4 +10,4 @@
 #include "../instances/Part.h"
 
 extern std::vector<BasePart*> g_instances;
-void Instance_Bind(lua_State* L);
+void Datatype_Instance_Bind(lua_State* L);

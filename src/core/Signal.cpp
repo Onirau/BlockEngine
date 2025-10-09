@@ -8,28 +8,13 @@ void Signal::ConnectLua(lua_State* state, int funcIndex) {
     LuaConnections.push_back(ref);
 }
 
-void Signal::ConnectCpp(const std::function<void()>& cb) {
+void Signal::Connect(const std::function<void(Instance*)>& cb) {
     CppConnections.push_back(cb);
 }
 
-void Signal::Fire() {
-    for (auto& cb : CppConnections)
-        cb();
-
-    if (!L) return;
-    for (int ref : LuaConnections) {
-        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-        lua_pushnil(L);//no arguments
-        if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-            printf("Signal Lua error: %s\n", lua_tostring(L, -1));
-            lua_pop(L, 1);
-        }
-    }
-}
-
 void Signal::Fire(const std::string& s) {
-    for (auto& cb : CppConnections)
-        cb();
+    //for (auto& cb : CppConnections)
+    //    cb();
 
     if (!L) return;
     for (int ref : LuaConnections) {
@@ -42,44 +27,21 @@ void Signal::Fire(const std::string& s) {
     }
 }
 
-void Signal::Fire(double n) {
-    for (auto& cb : CppConnections)
-        cb();
-
-    if (!L) return;
-    for (int ref : LuaConnections) {
-        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-        lua_pushnumber(L, n);
-        if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-            printf("Signal Lua error: %s\n", lua_tostring(L, -1));
-            lua_pop(L, 1);
-        }
-    }
-}
-
-void Signal::Fire(bool b) {
-    for (auto& cb : CppConnections)
-        cb();
-
-    if (!L) return;
-    for (int ref : LuaConnections) {
-        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-        lua_pushboolean(L, b);
-        if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-            printf("Signal Lua error: %s\n", lua_tostring(L, -1));
-            lua_pop(L, 1);
-        }
-    }
-}
-
 void Signal::Fire(Instance* inst) {
     for (auto& cb : CppConnections)
-        cb();
+        cb(inst);
 
     if (!L) return;
     for (int ref : LuaConnections) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-        lua_pushlightuserdata(L, inst);
+
+        //This is a bit of a hack, but it works for now
+        //We need to push the instance to the stack
+        Instance** udata = (Instance**)lua_newuserdata(L, sizeof(Instance*));
+        *udata = inst;
+        luaL_getmetatable(L, "Instance");
+        lua_setmetatable(L, -2);
+
         if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
             printf("Signal Lua error: %s\n", lua_tostring(L, -1));
             lua_pop(L, 1);

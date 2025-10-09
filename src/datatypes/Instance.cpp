@@ -1,7 +1,5 @@
 #include "Instance.h"
 
-std::vector<BasePart*> g_instances;
-
 static int Instance_new(lua_State* L) {
     const char* className = luaL_checkstring(L, 1);
 
@@ -27,7 +25,7 @@ static int Instance_gc(lua_State* L) {
     return 0;
 }
 
-void Instance_Bind(lua_State* L) {
+void Datatype_Instance_Bind(lua_State* L) {
     lua_newtable(L);
 
     lua_pushcfunction(L, Instance_new, "new");

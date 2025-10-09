@@ -33,4 +33,5 @@ extern std::vector<LuaTask> g_tasks;
 int Task_RunScript(lua_State* L, std::string& scriptText);
 
 void TaskScheduler_Step();
+bool TaskScheduler_RunToIdle();
 void Task_Bind(lua_State* L);

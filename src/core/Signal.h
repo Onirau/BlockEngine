@@ -5,6 +5,8 @@
 #include <optional>
 #include <vector>
 #include <string>
+#include <memory>
+#include <algorithm>
 
 #include "../../luau/VM/include/lua.h"
 #include "../../luau/VM/include/lualib.h"
@@ -26,19 +28,16 @@ struct Connection {
 struct Signal {
     lua_State* L = nullptr;
     std::vector<int> LuaConnections;//LUA registry refs
-    std::vector<std::function<void()>> CppConnections;//optional
+    std::vector<std::function<void(Instance*)>> CppConnections;
 
     //Lua
     void ConnectLua(lua_State* L, int funcIndex);
 
     //C++
-    void ConnectCpp(const std::function<void()>& cb);
+    void Connect(const std::function<void(Instance*)>& cb);
 
     //Fire
-    void Fire();//no args
     void Fire(const std::string& s);
-    void Fire(double n);
-    void Fire(bool b);
     void Fire(Instance* inst);
 
     void DisconnectAll();
