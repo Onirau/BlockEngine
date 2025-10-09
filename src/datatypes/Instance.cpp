@@ -31,9 +31,6 @@ static int Instance_new(lua_State* L) {
 }
 
 void Datatype_Instance_Bind(lua_State* L) {
-    //This creates the Instance.new() function
-    //Note: LuaClassBinder::BindAll() also creates Instance.new()
-    //This is kept for compatibility but may be redundant
     lua_newtable(L);
 
     lua_pushcfunction(L, Instance_new, "new");

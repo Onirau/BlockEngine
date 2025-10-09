@@ -39,6 +39,11 @@ file(GLOB_RECURSE COMMON_SOURCES
     "src/Global.cpp"
 )
 
+message(STATUS "Found source files:")
+foreach(source ${COMMON_SOURCES})
+    message(STATUS "  ${source}")
+endforeach()
+
 # Editor executable
 file(GLOB EDITOR_SOURCES "src/editor/*.cpp")
 add_executable(BlockEngineEditor ${EDITOR_SOURCES} ${COMMON_SOURCES})

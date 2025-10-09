@@ -85,51 +85,73 @@ void LuaClassBinder::PushInstance(lua_State* L, Instance* inst) {
     lua_setmetatable(L, -2);
 }
 
+int LuaClassBinder::MethodClosure(lua_State* L) {
+    //Get instance from upvalue (light userdata)
+    Instance* inst = (Instance*)lua_tolightuserdata(L, lua_upvalueindex(1));
+
+    //Get method name from upvalue
+    const char* methodName = lua_tostring(L, lua_upvalueindex(2));
+
+    if (!inst) {
+        luaL_error(L, "Invalid instance in method call");
+    }
+
+    //Find the method in the class hierarchy
+    std::string currentClass = inst->ClassName;
+    while (!currentClass.empty()) {
+        auto* desc = GetDescriptor(currentClass);
+        if (desc) {
+            auto it = desc->methods.find(methodName);
+            if (it != desc->methods.end()) {
+                return it->second(L, inst);
+            }
+            currentClass = desc->parentClassName;
+        } else {
+            break;
+        }
+    }
+
+    luaL_error(L, "Method '%s' not found on class '%s'",
+               methodName, inst->ClassName.c_str());
+}
+
 int LuaClassBinder::GenericIndex(lua_State* L) {
     Instance* inst = CheckInstance(L, 1);
     const char* key = luaL_checkstring(L, 2);
+
+    //debug
+    printf("Looking up '%s' on instance of class '%s'\n", key, inst->ClassName.c_str());
 
     //Walk up the inheritance chain
     std::string currentClass = inst->ClassName;
     while (!currentClass.empty()) {
         auto* desc = GetDescriptor(currentClass);
-        if (!desc) break;
+
+        if (!desc) {
+            printf("  No descriptor found for class '%s'\n", currentClass.c_str());
+            break;
+        }
+
+        printf("  Checking class '%s'\n", currentClass.c_str());
 
         //Check properties
         auto propIt = desc->properties.find(key);
         if (propIt != desc->properties.end() && propIt->second.getter) {
+            printf("  Found property '%s' in class '%s'\n", key, currentClass.c_str());
             return propIt->second.getter(L, inst);
         }
 
         //Check methods
         auto methodIt = desc->methods.find(key);
         if (methodIt != desc->methods.end()) {
-            //Push a C closure that captures the method function
-            //We need to store the method in the registry or use light userdata
+            //Push instance as light userdata
             lua_pushlightuserdata(L, inst);
+
+            //Store method name
             lua_pushstring(L, key);
-            lua_pushcclosure(L, [](lua_State* L) -> int {
-                Instance* inst = (Instance*)lua_tolightuserdata(L, lua_upvalueindex(1));
-                const char* methodName = lua_tostring(L, lua_upvalueindex(2));
-                
-                // Find the method in the class hierarchy
-                std::string currentClass = inst->ClassName;
-                while (!currentClass.empty()) {
-                    auto* desc = GetDescriptor(currentClass);
-                    if (desc) {
-                        auto it = desc->methods.find(methodName);
-                        if (it != desc->methods.end()) {
-                            // Replace 'self' at index 1 with the proper instance
-                            lua_pushlightuserdata(L, inst);
-                            lua_replace(L, 1);
-                            return it->second(L, inst);
-                        }
-                        currentClass = desc->parentClassName;
-                    } else {
-                        break;
-                    }
-                }
-                return 0; }, "method", 2);
+
+            //Create closure that will call the method
+            lua_pushcclosure(L, MethodClosure, "method", 2);
             return 1;
         }
 

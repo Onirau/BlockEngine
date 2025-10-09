@@ -41,6 +41,7 @@ private:
     static int GenericEq(lua_State* L);
     static int GenericGC(lua_State* L);
     static int GenericConstructor(lua_State* L);
+    static int MethodClosure(lua_State* L);
 
     static std::string GetMetatableName(const std::string& className);
     static void CreateMetatable(lua_State* L, const std::string& className);
