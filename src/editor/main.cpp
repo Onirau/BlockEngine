@@ -5,7 +5,6 @@ extern lua_State* L_main;
 extern Camera3D g_camera;
 
 int main(int argc, char* argv[]) {
-    EditorApplication app;
-    app.Run();
-    return 0;
+    EditorApplication app(argc, argv);
+    return app.Run();
 }

@@ -26,6 +26,8 @@ protected:
 
     virtual void RenderUI() = 0;
     virtual void Initialize() = 0;
+    virtual void PostLuaInitialize() {
+    }
     virtual void Cleanup() = 0;
 
 public:
@@ -71,6 +73,9 @@ public:
         luaL_openlibs(L_main);
 
         LuaBindings::RegisterScriptBindings(L_main, g_instances, g_camera);
+
+        //Call post-Lua initialization hook
+        PostLuaInitialize();
 
         PrepareRenderer();
         LoadSkybox();
