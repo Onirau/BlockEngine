@@ -13,6 +13,7 @@ static Color Color3ToColor(const Color3& c) {
         255};
 }
 
+//Implementation - NO default arguments here
 Texture2D GenerateDefaultTexture(int width, int height) {
     Image img = GenImageColor(width, height, BLANK);
 
@@ -70,11 +71,11 @@ void DrawPart(const Part part) {
     rlPopMatrix();
 }
 
-void RenderScene(Camera3D g_camera, const std::vector<BasePart*> g_instances) {
-    BeginMode3D(g_camera);
+void RenderScene(Camera3D camera, const std::vector<BasePart*> instances) {
+    BeginMode3D(camera);
     DrawSkybox();
 
-    for (BasePart* inst : g_instances) {
+    for (BasePart* inst : instances) {
         if (inst->ClassName == "Part") {
             Part* p = dynamic_cast<Part*>(inst);
             if (p) DrawPart(*p);

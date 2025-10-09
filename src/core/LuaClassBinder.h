@@ -35,6 +35,16 @@ class LuaClassBinder {
 private:
     static std::unordered_map<std::string, ClassDescriptor> s_classes;
 
+    static int GenericIndex(lua_State* L);
+    static int GenericNewIndex(lua_State* L);
+    static int GenericToString(lua_State* L);
+    static int GenericEq(lua_State* L);
+    static int GenericGC(lua_State* L);
+    static int GenericConstructor(lua_State* L);
+
+    static std::string GetMetatableName(const std::string& className);
+    static void CreateMetatable(lua_State* L, const std::string& className);
+
 public:
     //Register a class with inheritance
     static void RegisterClass(const std::string& className,
@@ -67,17 +77,8 @@ public:
     //Push instance to Lua stack
     static void PushInstance(lua_State* L, Instance* inst);
 
-private:
-    static int GenericIndex(lua_State* L);
-    static int GenericNewIndex(lua_State* L);
-    static int GenericToString(lua_State* L);
-    static int GenericEq(lua_State* L);
-    static int GenericGC(lua_State* L);
-    static int GenericConstructor(lua_State* L);
-
+    //Get class descriptor (now public for external access)
     static ClassDescriptor* GetDescriptor(const std::string& className);
-    static std::string GetMetatableName(const std::string& className);
-    static void CreateMetatable(lua_State* L, const std::string& className);
 };
 
 //Helper macros for cleaner property registration

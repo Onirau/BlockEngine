@@ -7,6 +7,9 @@
 #include "../../luau/VM/include/lualib.h"
 #include "../../luau/Compiler/include/luacode.h"
 
+#include "../core/LuaClassBinder.h"
+#include "../core/LuaBindings.h"
+
 #include "../instances/Part.h"
 
 extern std::vector<BasePart*> g_instances;

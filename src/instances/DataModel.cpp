@@ -1,6 +1,7 @@
 #include "DataModel.h"
 #include "Workspace.h"
 #include "../core/LuaBindings.h"
+#include "../core/LuaClassBinder.h"
 
 DataModel* DataModel::Instance = nullptr;
 
@@ -65,62 +66,41 @@ void DataModel::InitializeServices() {
     WorkspaceService->SetParent(this);
 }
 
-//Lua bindings
-static int DataModel_GetService(lua_State* L) {
-    DataModel** pdm = (DataModel**)luaL_checkudata(L, 1, "DataModelMeta");
-    DataModel* dm = *pdm;
-    const char* serviceName = luaL_checkstring(L, 2);
-
-    ::Instance* service = dm->GetService(std::string(serviceName));
-    if (!service) {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    //Return the appropriate userdata based on service type
-    if (strcmp(serviceName, "Workspace") == 0) {
-        Workspace** udata = (Workspace**)lua_newuserdata(L, sizeof(Workspace*));
-        *udata = dynamic_cast<Workspace*>(service);
-        luaL_getmetatable(L, "WorkspaceMeta");
-        lua_setmetatable(L, -2);
-    } else {
-        //Generic instance
-        ::Instance** udata = (::Instance**)lua_newuserdata(L, sizeof(::Instance*));
-        *udata = service;
-        luaL_getmetatable(L, "Instance");
-        lua_setmetatable(L, -2);
-    }
-
-    return 1;
-}
-
-static int DataModel_index(lua_State* L) {
-    DataModel** pdm = (DataModel**)luaL_checkudata(L, 1, "DataModelMeta");
-    const char* key = luaL_checkstring(L, 2);
-
-    if (strcmp(key, "GetService") == 0) {
-        lua_pushcfunction(L, DataModel_GetService, "GetService");
-        return 1;
-    }
-
-    //Delegate to Instance index
-    lua_pushnil(L);
-    return 1;
-}
-
 void DataModel::Bind(lua_State* L) {
-    luaL_newmetatable(L, "DataModelMeta");
+    LuaClassBinder::RegisterClass("DataModel", "Instance");
 
-    lua_pushcfunction(L, DataModel_index, "__index");
-    lua_setfield(L, -2, "__index");
+    //GetService method
+    LuaClassBinder::AddMethod("DataModel", "GetService",
+                              [](lua_State* L, ::Instance* inst) -> int {
+                                  auto* dm = static_cast<DataModel*>(inst);
+                                  const char* serviceName = luaL_checkstring(L, 2);
 
-    lua_pop(L, 1);
+                                  ::Instance* service = dm->GetService(std::string(serviceName));
+                                  if (service) {
+                                      LuaClassBinder::PushInstance(L, service);
+                                  } else {
+                                      lua_pushnil(L);
+                                  }
+                                  return 1;
+                              });
+
+    //FindService method
+    LuaClassBinder::AddMethod("DataModel", "FindService",
+                              [](lua_State* L, ::Instance* inst) -> int {
+                                  auto* dm = static_cast<DataModel*>(inst);
+                                  const char* serviceName = luaL_checkstring(L, 2);
+
+                                  ::Instance* service = dm->FindService(std::string(serviceName));
+                                  if (service) {
+                                      LuaClassBinder::PushInstance(L, service);
+                                  } else {
+                                      lua_pushnil(L);
+                                  }
+                                  return 1;
+                              });
 
     //Create global 'game' variable
     DataModel* dm = DataModel::GetInstance();
-    DataModel** udata = (DataModel**)lua_newuserdata(L, sizeof(DataModel*));
-    *udata = dm;
-    luaL_getmetatable(L, "DataModelMeta");
-    lua_setmetatable(L, -2);
+    LuaClassBinder::PushInstance(L, dm);
     lua_setglobal(L, "game");
 }

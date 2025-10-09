@@ -1,5 +1,6 @@
 #include "Instance.h"
 #include "../core/LuaBindings.h"
+#include "../core/LuaClassBinder.h"
 #include "DataModel.h"
 #include "Workspace.h"
 #include "Part.h"
@@ -11,18 +12,17 @@ Instance::Instance(const std::string& className)
 Instance::~Instance() {
     Destroy();
 }
+
 //------ Attributes ------//
 
 void Instance::SetAttribute(std::string& attribute, Attribute value) {
     for (auto& attr : Attributes) {
         if (attr.Name == attribute) {
             attr = value;
-
             AttributeChanged.Fire(attribute);
             return;
         }
     }
-
     Attributes.push_back(value);
     AttributeChanged.Fire(attribute);
 }
@@ -55,7 +55,7 @@ void Instance::RemoveTag(std::string& tag) {
     //TODO: implement tag removal
 }
 
-//------ Tags ------//
+//------ Hierarchy ------//
 
 void Instance::SetParent(Instance* newParent) {
     if (Parent == newParent)
@@ -72,7 +72,6 @@ void Instance::SetParent(Instance* newParent) {
 
     if (newParent) {
         newParent->Children.push_back(this);
-
         newParent->ChildAdded.Fire(this);
         newParent->DescendantAdded.Fire(this);
     }
@@ -85,7 +84,6 @@ void Instance::SetParent(Instance* newParent) {
 void Instance::AddChild(Instance* child) {
     if (!child || child == this)
         return;
-
     child->SetParent(this);
 }
 
@@ -97,7 +95,6 @@ void Instance::RemoveChild(Instance* child) {
     if (it != Children.end()) {
         Children.erase(it, Children.end());
         child->Parent = nullptr;
-
         ChildRemoved.Fire(child);
     }
 }
@@ -125,7 +122,6 @@ std::optional<Instance*> Instance::FindFirstAncestor(std::string& name) {
             return current;
         current = current->Parent;
     }
-
     return std::nullopt;
 }
 
@@ -136,7 +132,6 @@ std::optional<Instance*> Instance::FindFirstAncestorOfClass(std::string& classNa
             return current;
         current = current->Parent;
     }
-
     return std::nullopt;
 }
 
@@ -147,7 +142,6 @@ std::optional<Instance*> Instance::FindFirstAncestorWhichIsA(std::string& classN
             return current;
         current = current->Parent;
     }
-
     return std::nullopt;
 }
 
@@ -155,7 +149,6 @@ std::optional<Instance*> Instance::FindFirstChild(std::string& name) {
     for (auto* child : Children)
         if (child->Name == name)
             return child;
-
     return std::nullopt;
 }
 
@@ -163,7 +156,6 @@ std::optional<Instance*> Instance::FindFirstChildOfClass(std::string& className)
     for (auto* child : Children)
         if (child->ClassName == className)
             return child;
-
     return std::nullopt;
 }
 
@@ -171,7 +163,6 @@ std::optional<Instance*> Instance::FindFirstChildWhichIsA(std::string& className
     for (auto* child : Children)
         if (child->IsA(className))
             return child;
-
     return std::nullopt;
 }
 
@@ -215,7 +206,6 @@ bool Instance::IsAncestorOf(Instance* descendant) {
             return true;
         current = current->Parent;
     }
-
     return false;
 }
 
@@ -229,95 +219,7 @@ void Instance::ClearAllChildren() {
         if (child)
             child->Destroy();
     }
-
     Children.clear();
-}
-
-static int Instance_index(lua_State* L) {
-    Instance** pinst = (Instance**)luaL_checkudata(L, 1, "Instance");
-    Instance* inst = *pinst;
-    const char* key = luaL_checkstring(L, 2);
-
-    if (strcmp(key, "Name") == 0) {
-        lua_pushstring(L, inst->Name.c_str());
-    } else if (strcmp(key, "ClassName") == 0) {
-        lua_pushstring(L, inst->ClassName.c_str());
-    } else if (strcmp(key, "Parent") == 0) {
-        if (inst->Parent) {
-            //Return parent based on its type
-            if (inst->Parent->ClassName == "Workspace") {
-                lua_getglobal(L, "workspace");
-            } else if (inst->Parent->ClassName == "DataModel") {
-                lua_getglobal(L, "game");
-            } else {
-                Instance** udata = (Instance**)lua_newuserdata(L, sizeof(Instance*));
-                *udata = inst->Parent;
-                luaL_getmetatable(L, "Instance");
-                lua_setmetatable(L, -2);
-            }
-        } else {
-            lua_pushnil(L);
-        }
-    } else {
-        lua_pushnil(L);
-    }
-
-    return 1;
-}
-
-
-static int Instance_newindex(lua_State* L) {
-    Instance** pinst = (Instance**)luaL_checkudata(L, 1, "Instance");
-    Instance* inst = *pinst;
-    const char* key = luaL_checkstring(L, 2);
-
-    if (strcmp(key, "Name") == 0) {
-        inst->Name = luaL_checkstring(L, 3);
-    } else if (strcmp(key, "Parent") == 0) {
-        if (lua_isnil(L, 3)) {
-            inst->SetParent(nullptr);
-        } else {
-            //Try different parent types
-            Instance* newParent = nullptr;
-
-            //Check if it's workspace
-            if (lua_isuserdata(L, 3)) {
-                void* ud = lua_touserdata(L, 3);
-                if (ud != nullptr && lua_getmetatable(L, 3)) {
-                    luaL_getmetatable(L, "WorkspaceMeta");
-                    if (lua_rawequal(L, -1, -2)) {
-                        Workspace** pws = (Workspace**)ud;
-                        newParent = *pws;
-                        lua_pop(L, 2);
-                    } else {
-                        lua_pop(L, 1);
-                        luaL_getmetatable(L, "PartMeta");
-                        if (lua_rawequal(L, -1, -2)) {
-                            Part** ppart = (Part**)ud;
-                            newParent = *ppart;
-                            lua_pop(L, 2);
-                        } else {
-                            lua_pop(L, 1);
-                            luaL_getmetatable(L, "Instance");
-                            if (lua_rawequal(L, -1, -2)) {
-                                Instance** pinst2 = (Instance**)ud;
-                                newParent = *pinst2;
-                            }
-                            lua_pop(L, 2);
-                        }
-                    }
-                } else {
-                    lua_pop(L, 1);
-                }
-            }
-
-            if (newParent) {
-                inst->SetParent(newParent);
-            }
-        }
-    }
-
-    return 0;
 }
 
 bool Instance::IsA(const std::string& className) const {
@@ -325,130 +227,117 @@ bool Instance::IsA(const std::string& className) const {
     return this->ClassName == className || Object::IsA(className);
 }
 
-//-- Lua Bindings --//
-
-static bool inst_user_is_meta(lua_State* L, int idx, const char* meta) {
-    if (!lua_isuserdata(L, idx)) return false;
-    if (!lua_getmetatable(L, idx)) return false;//pushes metatable
-    luaL_getmetatable(L, meta);//pushes registered metatable
-    bool eq = lua_rawequal(L, -1, -2);
-    lua_pop(L, 2);
-    return eq;
-}
-
-static Instance* get_instance_from_any(lua_State* L, int idx) {
-    if (inst_user_is_meta(L, idx, "Instance")) {
-        return *(Instance**)lua_touserdata(L, idx);
-    }
-    if (inst_user_is_meta(L, idx, "BasePartMeta")) {
-        return *(BasePart**)lua_touserdata(L, idx);
-    }
-    if (inst_user_is_meta(L, idx, "PartMeta")) {
-        return *(Part**)lua_touserdata(L, idx);
-    }
-    luaL_typeerrorL(L, idx, "Instance or derived userdata");
-    return nullptr;
-}
-
-static int l_instance_isA(lua_State* L) {
-    Instance* inst = get_instance_from_any(L, 1);
-    const char* className = luaL_checkstring(L, 2);
-    lua_pushboolean(L, inst->IsA(className));
-    return 1;
-}
-
-static int l_instance_getChildren(lua_State* L) {
-    Instance* inst = get_instance_from_any(L, 1);
-    lua_newtable(L);
-    int i = 1;
-    for (Instance* child : inst->GetChildren()) {
-        lua_pushinteger(L, i++);
-        Instance** udata = (Instance**)lua_newuserdata(L, sizeof(Instance*));
-        *udata = child;
-        luaL_getmetatable(L, "Instance");
-        lua_setmetatable(L, -2);
-        lua_settable(L, -3);
-    }
-    return 1;
-}
-
-static int l_instance_getParent(lua_State* L) {
-    Instance* inst = get_instance_from_any(L, 1);
-    if (inst->Parent) {
-        Instance** udata = (Instance**)lua_newuserdata(L, sizeof(Instance*));
-        *udata = inst->Parent;
-        luaL_getmetatable(L, "Instance");
-        lua_setmetatable(L, -2);
-    } else {
-        lua_pushnil(L);
-    }
-    return 1;
-}
-
-static int l_instance_getName(lua_State* L) {
-    Instance* inst = get_instance_from_any(L, 1);
-    lua_pushstring(L, inst->Name.c_str());
-    return 1;
-}
-
-static int l_instance_setName(lua_State* L) {
-    Instance* inst = get_instance_from_any(L, 1);
-
-    const char* name = luaL_checkstring(L, 2);
-    if (strcmp(name, "Name") == 0) {
-        const char* newName = luaL_checkstring(L, 3);
-        inst->Name = newName;
-    }
-
-    return 0;
-}
-
-static int l_instance_setParent(lua_State* L) {
-    Instance* inst = get_instance_from_any(L, 1);
-    Instance* parent = get_instance_from_any(L, 2);
-    if (parent) inst->SetParent(parent);
-    return 0;
-}
-
-static int l_instance_index(lua_State* L) {
-    (void)get_instance_from_any(L, 1);//validate and allow derived types
-    const char* key = luaL_checkstring(L, 2);
-
-    luaL_getmetatable(L, "Instance");
-    lua_getfield(L, -1, key);
-
-    if (!lua_isnil(L, -1)) {
-        return 1;
-    }
-    lua_pop(L, 2);
-
-    if (strcmp(key, "Parent") == 0) {
-        return l_instance_getParent(L);
-    } else if (strcmp(key, "Name") == 0) {
-        return l_instance_getName(L);
-    }
-
-    return 0;
-}
-
-static const luaL_Reg instancelib[] = {
-    {"IsA", l_instance_isA},
-    {"GetChildren", l_instance_getChildren},
-    {NULL, NULL}};
+//Bind
 
 void Class_Instance_Bind(lua_State* L) {
-    luaL_newmetatable(L, "Instance");
-    luaL_register(L, NULL, instancelib);
+    LuaClassBinder::RegisterClass("Instance", "Object");
 
-    lua_pushcfunction(L, l_instance_index, "__index");
-    lua_setfield(L, -2, "__index");
+    //Properties
+    LuaClassBinder::AddProperty("Instance", "Name", [](lua_State* L, Instance* inst) -> int {
+            lua_pushstring(L, inst->Name.c_str());
+            return 1; }, [](lua_State* L, Instance* inst, int valueIdx) -> int {
+            inst->Name = luaL_checkstring(L, valueIdx);
+            return 0; });
 
-    lua_pushcfunction(L, l_instance_setName, "__newindex");
-    lua_setfield(L, -2, "__newindex");
+    LuaClassBinder::AddProperty("Instance", "ClassName", [](lua_State* L, Instance* inst) -> int {
+            lua_pushstring(L, inst->ClassName.c_str());
+            return 1; },
+                                nullptr);//Read-only
 
-    //Ensure equality compares underlying C++ pointers
-    lua_pushcfunction(L, Lua_UserdataPtrEq, "__eq");
-    lua_setfield(L, -2, "__eq");
+    LuaClassBinder::AddProperty("Instance", "Parent", [](lua_State* L, Instance* inst) -> int {
+            if (inst->Parent) {
+                LuaClassBinder::PushInstance(L, inst->Parent);
+            } else {
+                lua_pushnil(L);
+            }
+            return 1; }, [](lua_State* L, Instance* inst, int valueIdx) -> int {
+            if (lua_isnil(L, valueIdx)) {
+                inst->SetParent(nullptr);
+            } else {
+                Instance* newParent = LuaClassBinder::CheckInstance(L, valueIdx);
+                inst->SetParent(newParent);
+            }
+            return 0; });
 
-    lua_pop(L, 1);
+    //Methods
+    LuaClassBinder::AddMethod("Instance", "IsA",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  const char* className = luaL_checkstring(L, 2);
+                                  lua_pushboolean(L, inst->IsA(className));
+                                  return 1;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "GetChildren",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  lua_newtable(L);
+                                  int i = 1;
+                                  for (Instance* child : inst->GetChildren()) {
+                                      lua_pushinteger(L, i++);
+                                      LuaClassBinder::PushInstance(L, child);
+                                      lua_settable(L, -3);
+                                  }
+                                  return 1;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "GetDescendants",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  lua_newtable(L);
+                                  int i = 1;
+                                  for (Instance* descendant : inst->GetDescendants()) {
+                                      lua_pushinteger(L, i++);
+                                      LuaClassBinder::PushInstance(L, descendant);
+                                      lua_settable(L, -3);
+                                  }
+                                  return 1;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "FindFirstChild",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  std::string name = luaL_checkstring(L, 2);
+                                  auto result = inst->FindFirstChild(name);
+                                  if (result.has_value()) {
+                                      LuaClassBinder::PushInstance(L, result.value());
+                                  } else {
+                                      lua_pushnil(L);
+                                  }
+                                  return 1;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "FindFirstChildWhichIsA",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  std::string className = luaL_checkstring(L, 2);
+                                  auto result = inst->FindFirstChildWhichIsA(className);
+                                  if (result.has_value()) {
+                                      LuaClassBinder::PushInstance(L, result.value());
+                                  } else {
+                                      lua_pushnil(L);
+                                  }
+                                  return 1;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "Destroy",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  inst->Destroy();
+                                  return 0;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "ClearAllChildren",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  inst->ClearAllChildren();
+                                  return 0;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "IsAncestorOf",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  Instance* descendant = LuaClassBinder::CheckInstance(L, 2);
+                                  lua_pushboolean(L, inst->IsAncestorOf(descendant));
+                                  return 1;
+                              });
+
+    LuaClassBinder::AddMethod("Instance", "IsDescendantOf",
+                              [](lua_State* L, Instance* inst) -> int {
+                                  Instance* ancestor = LuaClassBinder::CheckInstance(L, 2);
+                                  lua_pushboolean(L, inst->IsDescendantOf(ancestor));
+                                  return 1;
+                              });
 }

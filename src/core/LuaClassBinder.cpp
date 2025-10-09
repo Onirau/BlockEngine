@@ -1,10 +1,10 @@
-
 #include "LuaClassBinder.h"
 #include "../instances/Instance.h"
 #include "../instances/BasePart.h"
 #include "../instances/Part.h"
 #include "../datatypes/Vector3.h"
 #include "../datatypes/Color3.h"
+#include <unordered_set>
 
 std::unordered_map<std::string, ClassDescriptor> LuaClassBinder::s_classes;
 
@@ -63,7 +63,7 @@ Instance* LuaClassBinder::CheckInstance(lua_State* L, int idx, const std::string
         return nullptr;
     }
 
-    if (!(*pinst)->IsA(className)) {
+    if (!className.empty() && !(*pinst)->IsA(className)) {
         luaL_error(L, "Expected %s, got %s", className.c_str(), (*pinst)->ClassName.c_str());
         return nullptr;
     }
@@ -104,17 +104,29 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
         //Check methods
         auto methodIt = desc->methods.find(key);
         if (methodIt != desc->methods.end()) {
-            //Push a closure with the instance
+            //Push a C closure that captures the method function
+            //We need to store the method in the registry or use light userdata
             lua_pushlightuserdata(L, inst);
+            lua_pushstring(L, key);
             lua_pushcclosure(L, [](lua_State* L) -> int {
                 Instance* inst = (Instance*)lua_tolightuserdata(L, lua_upvalueindex(1));
-                const char* key = luaL_checkstring(L, lua_upvalueindex(2));
-                // Find and call the method
-                auto* desc = GetDescriptor(inst->ClassName);
-                if (desc) {
-                    auto it = desc->methods.find(key);
-                    if (it != desc->methods.end()) {
-                        return it->second(L, inst);
+                const char* methodName = lua_tostring(L, lua_upvalueindex(2));
+                
+                // Find the method in the class hierarchy
+                std::string currentClass = inst->ClassName;
+                while (!currentClass.empty()) {
+                    auto* desc = GetDescriptor(currentClass);
+                    if (desc) {
+                        auto it = desc->methods.find(methodName);
+                        if (it != desc->methods.end()) {
+                            // Replace 'self' at index 1 with the proper instance
+                            lua_pushlightuserdata(L, inst);
+                            lua_replace(L, 1);
+                            return it->second(L, inst);
+                        }
+                        currentClass = desc->parentClassName;
+                    } else {
+                        break;
                     }
                 }
                 return 0; }, "method", 2);
@@ -170,6 +182,7 @@ int LuaClassBinder::GenericEq(lua_State* L) {
 }
 
 int LuaClassBinder::GenericGC(lua_State* L) {
+    //Don't delete instances here - they're managed elsewhere
     return 0;
 }
 
@@ -220,16 +233,34 @@ void LuaClassBinder::CreateMetatable(lua_State* L, const std::string& className)
     if (desc && !desc->parentClassName.empty()) {
         std::string parentMeta = GetMetatableName(desc->parentClassName);
         luaL_getmetatable(L, parentMeta.c_str());
-        lua_setmetatable(L, -2);
+        if (!lua_isnil(L, -1)) {
+            lua_setmetatable(L, -2);
+        } else {
+            lua_pop(L, 1);//Pop the nil
+        }
     }
 
     lua_pop(L, 1);
 }
 
 void LuaClassBinder::BindAll(lua_State* L) {
-    //Create metatables
-    for (const auto& [className, desc] : s_classes) {
-        CreateMetatable(L, className);
+    //Create metatables in order (parents before children)
+    //Simple approach: iterate multiple times until all are created
+    std::unordered_set<std::string> created;
+    bool progress = true;
+
+    while (progress && created.size() < s_classes.size()) {
+        progress = false;
+        for (const auto& [className, desc] : s_classes) {
+            if (created.count(className)) continue;
+
+            //Check if parent is created (or no parent)
+            if (desc.parentClassName.empty() || created.count(desc.parentClassName)) {
+                CreateMetatable(L, className);
+                created.insert(className);
+                progress = true;
+            }
+        }
     }
 
     //Create Instance.new()

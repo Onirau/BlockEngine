@@ -1,19 +1,28 @@
 #include "Instance.h"
+#include "../core/LuaClassBinder.h"
+#include "../core/LuaBindings.h"
+#include "../instances/Part.h"
 
+//This is now handled by LuaClassBinder::GenericConstructor
+//But we keep this for backward compatibility if needed
 static int Instance_new(lua_State* L) {
     const char* className = luaL_checkstring(L, 1);
 
+    //Try to use LuaClassBinder's constructor system
+    auto* desc = LuaClassBinder::GetDescriptor(className);
+    if (desc && desc->constructor) {
+        Instance* inst = desc->constructor();
+        LuaClassBinder::PushInstance(L, inst);
+        return 1;
+    }
+
+    //Fallback for backward compatibility
     if (strcmp(className, "Part") == 0) {
         Part* p = new Part();
-        g_instances.push_back(p);
-
-        Part** udata = (Part**)lua_newuserdata(L, sizeof(Part*));
-        *udata = p;
-
-        luaL_getmetatable(L, "PartMeta");
-        lua_setmetatable(L, -2);
-
-        g_instances.push_back(p);
+        if (LuaBindings::g_instances) {
+            LuaBindings::g_instances->push_back(p);
+        }
+        LuaClassBinder::PushInstance(L, p);
         return 1;
     }
 
@@ -21,11 +30,10 @@ static int Instance_new(lua_State* L) {
     return 0;
 }
 
-static int Instance_gc(lua_State* L) {
-    return 0;
-}
-
 void Datatype_Instance_Bind(lua_State* L) {
+    //This creates the Instance.new() function
+    //Note: LuaClassBinder::BindAll() also creates Instance.new()
+    //This is kept for compatibility but may be redundant
     lua_newtable(L);
 
     lua_pushcfunction(L, Instance_new, "new");
