@@ -16,6 +16,7 @@
 #include "../instances/Instance.h"
 
 #include "Signal.h"
+#include "../Global.h"
 
 #include "raylib.h"
 #include "raymath.h"
@@ -30,7 +31,4 @@ int Lua_SetCameraPos(lua_State* L);
 void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3D& g_camera);
 }//namespace LuaBindings
 
-// Shared Lua C function used across multiple metatables to compare
-// userdata by their underlying Instance* pointer. Exposed so all
-// metatables can reference the exact same function pointer.
 int Lua_UserdataPtrEq(lua_State* L);

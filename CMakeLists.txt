@@ -32,52 +32,50 @@ else()
 endif()
 
 # Collect source files
-file(GLOB_RECURSE SOURCES "src/**/*.cpp")
-list(APPEND SOURCES src/main.cpp)
-
-# Create executable
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-# Include directories
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${DEPS_DIR}/luau/Ast/include
-    ${DEPS_DIR}/luau/Config/include
-    ${DEPS_DIR}/luau/VM/include
-    ${DEPS_DIR}/luau/Compiler/include
-    ${DEPS_DIR}/luau/Analysis/include
-    ${CMAKE_SOURCE_DIR}
+file(GLOB_RECURSE COMMON_SOURCES 
+    "src/core/*.cpp"
+    "src/datatypes/*.cpp"
+    "src/instances/*.cpp"
+    "src/Global.cpp"
 )
 
-# Link Luau libraries
-if(LUAU_FOUND)
-    target_link_libraries(${PROJECT_NAME}
-        Luau.Ast
-        Luau.Config
-        Luau.Analysis
-        Luau.Compiler
-        Luau.VM
-    )
-endif()
+# Editor executable
+file(GLOB EDITOR_SOURCES "src/editor/*.cpp")
+add_executable(BlockEngineEditor ${EDITOR_SOURCES} ${COMMON_SOURCES})
 
-# Link raylib
-if(raylib_FOUND)
-    target_link_libraries(${PROJECT_NAME} raylib)
-endif()
+# Runtime executable
+file(GLOB RUNTIME_SOURCES "src/runtime/*.cpp")
+add_executable(BlockEngineRuntime ${RUNTIME_SOURCES} ${COMMON_SOURCES})
 
-# Platform-specific libraries
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME}
-        winmm
-        gdi32
-        opengl32
+# Include directories for both executables
+foreach(TARGET BlockEngineEditor BlockEngineRuntime)
+    target_include_directories(${TARGET} PRIVATE 
+        ${DEPS_DIR}/luau/Ast/include
+        ${DEPS_DIR}/luau/Config/include
+        ${DEPS_DIR}/luau/VM/include
+        ${DEPS_DIR}/luau/Compiler/include
+        ${DEPS_DIR}/luau/Analysis/include
+        ${CMAKE_SOURCE_DIR}
     )
-else()
-    target_link_libraries(${PROJECT_NAME}
-        m
-        dl
-        pthread
-        GL
-        rt
-        X11
-    )
-endif()
+
+    # Link libraries
+    target_link_libraries(${TARGET} PRIVATE raylib Luau.VM Luau.Ast Luau.Compiler)
+
+    # Platform-specific libraries
+    if(WIN32)
+        target_link_libraries(${TARGET} PRIVATE
+            winmm
+            gdi32
+            opengl32
+        )
+    else()
+        target_link_libraries(${TARGET} PRIVATE
+            m
+            dl
+            pthread
+            GL
+            rt
+            X11
+        )
+    endif()
+endforeach()
