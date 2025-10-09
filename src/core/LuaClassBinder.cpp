@@ -119,26 +119,27 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
     Instance* inst = CheckInstance(L, 1);
     const char* key = luaL_checkstring(L, 2);
 
-    //debug
-    printf("Looking up '%s' on instance of class '%s'\n", key, inst->ClassName.c_str());
-
     //Walk up the inheritance chain
     std::string currentClass = inst->ClassName;
+    std::vector<std::string> checked;
+
     while (!currentClass.empty()) {
+        checked.push_back(currentClass);
         auto* desc = GetDescriptor(currentClass);
 
         if (!desc) {
-            printf("  No descriptor found for class '%s'\n", currentClass.c_str());
+            printf("  WARNING: No descriptor found for class '%s'\n", currentClass.c_str());
             break;
         }
 
-        printf("  Checking class '%s'\n", currentClass.c_str());
-
-        //Check properties
+        //Check properties FIRST
         auto propIt = desc->properties.find(key);
-        if (propIt != desc->properties.end() && propIt->second.getter) {
-            printf("  Found property '%s' in class '%s'\n", key, currentClass.c_str());
-            return propIt->second.getter(L, inst);
+        if (propIt != desc->properties.end()) {
+            if (propIt->second.getter) {
+                return propIt->second.getter(L, inst);
+            } else {
+                printf("  WARNING: Property '%s' found but has no getter\n", key);
+            }
         }
 
         //Check methods
@@ -146,10 +147,8 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
         if (methodIt != desc->methods.end()) {
             //Push instance as light userdata
             lua_pushlightuserdata(L, inst);
-
             //Store method name
             lua_pushstring(L, key);
-
             //Create closure that will call the method
             lua_pushcclosure(L, MethodClosure, "method", 2);
             return 1;
@@ -157,6 +156,11 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
 
         currentClass = desc->parentClassName;
     }
+
+    printf("  Property/method '%s' not found in hierarchy: ", key);
+    for (const auto& c : checked)
+        printf("%s ", c.c_str());
+    printf("\n");
 
     lua_pushnil(L);
     return 1;

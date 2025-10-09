@@ -8,7 +8,6 @@
 
 #include "../datatypes/Vector3.h"
 #include "../datatypes/Color3.h"
-#include "../datatypes/Instance.h"
 #include "../datatypes/Task.h"
 
 #include "../instances/BasePart.h"

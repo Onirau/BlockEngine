@@ -6,7 +6,6 @@
 
 #include "../datatypes/Vector3.h"
 #include "../datatypes/Color3.h"
-#include "../datatypes/Instance.h"
 
 #include "../instances/BasePart.h"
 #include "../instances/Part.h"

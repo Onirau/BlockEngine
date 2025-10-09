@@ -1,5 +1,4 @@
 #include "LuaBindings.h"
-#include "../datatypes/Instance.h"
 #include "../datatypes/Vector3.h"
 #include "../datatypes/Color3.h"
 
@@ -79,8 +78,7 @@ void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3
     lua_setfield(L, -2, "SetCameraPos");
     lua_setglobal(L, "Engine");
 
-    //Register datatypes (these still use old binding system)
-    Datatype_Instance_Bind(L);//This creates Instance.new() - might need update
+    //Register datatypes
     Vector3Game_Bind(L);
     Color3_Bind(L);
     Task_Bind(L);
