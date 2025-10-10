@@ -1,0 +1,82 @@
+﻿name: BlockEngine CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake ccache \
+            libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxxf86vm-dev \
+            mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev git
+
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-ccache
+          restore-keys: |
+            ${{ runner.os }}-ccache
+          max-size: 500M
+
+      - name: Clone dependencies
+        run: |
+          mkdir -p dependencies
+          git clone --depth 1 https://github.com/luau-lang/luau.git dependencies/luau
+          git clone --depth 1 https://github.com/raysan5/raylib.git dependencies/raylib
+
+      - name: Configure and build with ccache
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          export CCACHE_DIR="${{ github.workspace }}/.ccache"
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
+          cmake --build . -- -j$(nproc)
+
+      - name: ccache statistics
+        run: ccache -s
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: "3.27.0"
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
+      - name: Clone dependencies
+        run: |
+          mkdir dependencies -Force
+          git clone --depth 1 https://github.com/luau-lang/luau.git dependencies/luau
+          git clone --depth 1 https://github.com/raysan5/raylib.git dependencies/raylib
+
+      - name: Configure and build with sccache
+        run: |
+          $env:SCCACHE_DIR = "${{ github.workspace }}\.sccache"
+          mkdir build -Force
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          cmake --build . --config Release --parallel
+
+      - name: sccache statistics
+        run: sccache --show-stats
