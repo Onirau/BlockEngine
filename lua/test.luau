@@ -15,9 +15,15 @@ part2.Parent = part1
 
 -- try making a lua source
 local script = Instance.new("Script")
-script.Name = "MyScript"
+script.Name = "TestScript"
 script.Source = "print('Hello from script!')"
 script.Enabled = true
+
+
+local script2 = Instance.new("ModuleScript")
+script2.Name = "TestModuleScript"
+script2.Source = "return true"
+script2.Enabled = true
 -- script:Execute()
 
 -- test debug

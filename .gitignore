@@ -6,5 +6,9 @@ build/*
 dependencies/*
 !dependencies/.gitkeep
 
+# Locally Generated Documentation
+scripts/documentation/api-dump.json
+docs/
+
 # IDE
 .vscode/

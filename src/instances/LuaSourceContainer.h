@@ -14,13 +14,44 @@
 #include "../../luau/VM/include/lua.h"
 #include "../../luau/VM/include/lualib.h"
 
+/**
+ * @class LuaSourceContainer
+ * @brief Base class for all script types that can execute Lua code
+ *
+ * @description
+ * LuaSourceContainer provides the foundation for Lua.
+ * It handles loading and executing Lua source code from embedding
+ * or a file path.
+ *
+ * @inherits Instance
+ *
+ */
 struct LuaSourceContainer : public Instance {
     //-- Properties --//
     std::string Name = ClassName;
 
-    // Script properties
+    /**
+     * @property Enabled
+     * @type bool
+     * @default true
+     * @description When true, the script can execute; when appropriate.
+     */
     bool Enabled = true;
+
+    /**
+     * @property Source
+     * @type string
+     * @default ""
+     * @description The Lua source code to execute.
+     */
     std::string Source = "";
+
+    /**
+     * @property SourcePath
+     * @type string
+     * @default ""
+     * @description File path to fetch and load source code from.
+     */
     std::string SourcePath = "";
 
     //-- Events --//
@@ -29,10 +60,7 @@ struct LuaSourceContainer : public Instance {
     LuaSourceContainer(const std::string &className = "LuaSourceContainer");
     virtual ~LuaSourceContainer() = default;
 
-    // Execute the script (reads from Source or SourcePath based on priority)
     bool Execute(lua_State *L);
-
-    // Load source from file path
     bool LoadFromPath();
 
     virtual bool IsA(const std::string &className) const;

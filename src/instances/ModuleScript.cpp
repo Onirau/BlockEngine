@@ -13,8 +13,6 @@ ModuleScript::~ModuleScript() {
     // Clean up the module reference if it exists
     if (ModuleRef != LUA_NOREF && LuaSourceContainer::Enabled) {
         // Note: We need the lua_State to unref, but we don't store it
-        // In a real implementation, you might want to store the L or use a
-        // global
     }
 }
 
