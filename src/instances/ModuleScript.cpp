@@ -59,7 +59,16 @@ int ModuleScript::Require(lua_State *L) {
 
     // Load the bytecode
     std::string chunkname = "@" + Name;
-    int loadResult = luau_load(L, chunkname.c_str(), bytecode, bytecodeSize, 0);
+    // Prepare per-module environment and pass it to luau_load
+    lua_newtable(L);              // env
+    lua_newtable(L);              // mt
+    lua_pushvalue(L, LUA_GLOBALSINDEX); // _G
+    lua_setfield(L, -2, "__index");
+    lua_setmetatable(L, -2);      // setmetatable(env, mt)
+
+    int envIndex = lua_gettop(L);
+    int loadResult = luau_load(L, chunkname.c_str(), bytecode, bytecodeSize, envIndex);
+    lua_remove(L, envIndex);      // remove env, keep function
     free(bytecode);
 
     if (loadResult != 0) {

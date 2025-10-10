@@ -1,6 +1,7 @@
 #include "LuaBindings.h"
 #include "../datatypes/Color3.h"
 #include "../datatypes/Vector3.h"
+#include "./EnumRegistry.h"
 
 #include "../instances/DataModel.h"
 #include "../instances/LuaSourceContainer.h"
@@ -93,6 +94,9 @@ void RegisterScriptBindings(lua_State *L, std::vector<BasePart *> &parts,
     lua_pushcfunction(L, Lua_SetCameraPos, "SetCameraPos");
     lua_setfield(L, -2, "SetCameraPos");
     lua_setglobal(L, "Engine");
+
+    // Register Enums
+    RegisterAllEnums(L);
 
     // Register datatypes
     Vector3Game_Bind(L);

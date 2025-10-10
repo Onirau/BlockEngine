@@ -14,7 +14,16 @@ int Task_RunScript(lua_State *L, std::string &scriptText) {
     LuaTask task(L);
     lua_State *thread = task.thread;
 
-    int loadStatus = luau_load(thread, "ScriptChunk", bytecode, bcSize, 0);
+    // Prepare per-script environment and pass it to luau_load
+    lua_newtable(thread);              // env
+    lua_newtable(thread);              // mt
+    lua_pushvalue(thread, LUA_GLOBALSINDEX); // _G
+    lua_setfield(thread, -2, "__index");
+    lua_setmetatable(thread, -2);      // setmetatable(env, mt)
+
+    int envIndex = lua_gettop(thread);
+    int loadStatus = luau_load(thread, "ScriptChunk", bytecode, bcSize, envIndex);
+    lua_remove(thread, envIndex);      // remove env, keep function
     if (loadStatus != LUA_OK) {
         const char *err = lua_tostring(thread, -1);
         printf("Error loading script: %s\n", err);

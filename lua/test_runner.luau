@@ -13,6 +13,7 @@ local function outputTest(ok, msg)
 end
 
 local function expect(actual)
+	
 	local function fail(msg)
 		assertsFailed = assertsFailed + 1
 		currentTestFailed = true
@@ -20,6 +21,18 @@ local function expect(actual)
 		print("[ASSERT] " .. currentName .. ": " .. msg)
 	end
 	return {
+		throws = function(substr)
+			if type(actual) ~= "function" then
+				fail("expected function for throws()")
+			end
+			local ok, err = pcall(actual)
+			if ok then
+				fail("expected error, got none")
+			elseif substr and not tostring(err):find(substr, 1, true) then
+				fail("expected error containing '" .. substr .. "', got: " .. tostring(err))
+			end
+			assertsTotal += 1
+		end,
 		eq = function(expected)
 			if actual ~= expected then
 				fail("expected " .. tostring(expected) .. ", got " .. tostring(actual))
