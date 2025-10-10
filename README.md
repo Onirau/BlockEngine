@@ -8,6 +8,7 @@
 
 API documentation is available for each branch:
 
+- [Main Branch Docs](https://onirau.github.io/LemonEngine/main/)
 - [Develop Branch Docs](https://onirau.github.io/LemonEngine/develop/)
 
 ## Supported Platforms
