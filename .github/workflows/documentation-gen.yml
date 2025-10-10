@@ -29,12 +29,14 @@ jobs:
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           echo "Using branch name: $BRANCH_NAME"
-
+          
       - name: Generate documentation
         run: |
           OUTPUT_DIR=docs/$BRANCH_NAME
           mkdir -p $OUTPUT_DIR
           python scripts/documentation/doc_tool.py all --output $OUTPUT_DIR
+          echo "Generated docs in $OUTPUT_DIR"
+          ls -R $OUTPUT_DIR
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
