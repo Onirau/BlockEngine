@@ -51,6 +51,7 @@ class CommentExtractor:
         self.classes: Dict[str, ClassInfo] = {}
         self.enums: Dict[str, dict] = {}
         self.datatypes: Dict[str, ClassInfo] = {}
+        self.type_renames: Dict[str, str] = {}
     
     def extract(self):
         print(f"\nScanning directory: {self.src_dir}")
@@ -70,6 +71,8 @@ class CommentExtractor:
         
         print("\nInheriting parent documentation...")
         self.inherit_parent_docs()
+
+        self.apply_type_renames()
         
         api_dump = {
             "Version": 0,
@@ -177,6 +180,23 @@ class CommentExtractor:
         print(f"API dump written to: {self.output_file}")
         print(f"\nNext: python doc_tool.py generate")
     
+    def apply_type_renames(self):
+        """Apply type renames to all member types and return types"""
+        for class_info in list(self.classes.values()) + list(self.datatypes.values()):
+            for member in class_info.members:
+                # Rename value types
+                if member.value_type in self.type_renames:
+                    member.value_type = self.type_renames[member.value_type]
+                
+                # Rename return types
+                if member.return_type in self.type_renames:
+                    member.return_type = self.type_renames[member.return_type]
+                
+                # Rename parameter types
+                for param in member.parameters:
+                    if param.type in self.type_renames:
+                        param.type = self.type_renames[param.type]
+    
     def inherit_parent_docs(self):
         for class_name, class_info in self.classes.items():
             if not class_info.superclass:
@@ -215,11 +235,12 @@ class CommentExtractor:
         
         for match in re.finditer(class_pattern, content, re.DOTALL):
             doc_block = match.group(1)
-            class_name = match.group(2)
+            cpp_class_name = match.group(2)
             parent_name = match.group(3) if match.group(3) else ""
             
-            class_info = self.parse_class_doc(doc_block, class_name, parent_name)
+            class_info = self.parse_class_doc(doc_block, cpp_class_name, parent_name)
             class_info.source_file = str(file_path.relative_to(self.src_dir))
+            class_info.cpp_name = cpp_class_name
             
             class_start = match.end()
             class_body = self.extract_class_body(content, class_start)
@@ -227,12 +248,11 @@ class CommentExtractor:
             self.extract_members(class_body, class_info)
             
             # Route structs in datatypes to DataTypes
+            key_name = class_info.name
             if 'datatypes' in str(file_path.as_posix()):
-                self.datatypes[class_name] = class_info
-                print(f"  └─ [DataType] {class_name}")
+                self.datatypes[key_name] = class_info
             else:
-                self.classes[class_name] = class_info
-                print(f"  └─ {class_name}" + (f" : {parent_name}" if parent_name else ""))
+                self.classes[key_name] = class_info
 
     def process_enums(self, file_path: Path):
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -319,12 +339,19 @@ class CommentExtractor:
     def process_datatypes(self, file_path: Path):
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
+
         # Find plain struct definitions without requiring a docblock
         for match in re.finditer(r'\bstruct\s+(\w+)\s*\{', content):
             name = match.group(1)
+
             # Skip if already captured as a class
             if name in self.classes:
                 continue
+
+            mapped_name = self.type_renames.get(name, name)
+            if mapped_name in self.datatypes:
+                continue
+
             # Extract body
             start = match.end() - 1
             body = self.extract_class_body(content, start)
@@ -332,6 +359,7 @@ class CommentExtractor:
             ci.source_file = str(file_path.relative_to(self.src_dir))
             if body:
                 self.extract_members(body, ci)
+                
             self.datatypes[name] = ci
     
     def parse_class_doc(self, doc_text: str, class_name: str, parent_name: str) -> ClassInfo:
@@ -365,7 +393,15 @@ class CommentExtractor:
     def process_class_tag(self, class_info: ClassInfo, tag: str, content: str):
         content = content.strip()
         
-        if tag == "description" or tag == "brief":
+        if tag == "class":
+            old_name = class_info.name
+            new_name = content
+            class_info.name = new_name
+
+            if old_name != new_name:
+                self.type_renames[old_name] = new_name
+                print(f"  └─ Renaming {old_name} -> {new_name}")
+        elif tag == "description" or tag == "brief":
             class_info.description = content
         elif tag == "example":
             code_match = re.search(r'```lua\s*(.*?)```', content, re.DOTALL)
