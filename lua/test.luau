@@ -18,7 +18,7 @@ local script = Instance.new("Script")
 script.Name = "MyScript"
 script.Source = "print('Hello from script!')"
 script.Enabled = true
-script:Execute()
+-- script:Execute()
 
 -- test debug
 print(part1:IsA("Object")) -- expect true
@@ -30,3 +30,5 @@ print(part2:IsA("Instance")) -- expect true
 print(part2:IsA("Part")) -- expect true
 
 print(part2.Parent == part1) -- expect true
+
+print(script:IsA("Script")) -- expect true

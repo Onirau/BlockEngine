@@ -119,6 +119,8 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
     Instance* inst = CheckInstance(L, 1);
     const char* key = luaL_checkstring(L, 2);
 
+    //todo: add some kind of lookup
+
     printf("GenericIndex called: object class='%s', looking for key='%s'\n",
            inst->ClassName.c_str(), key);
 
