@@ -1,7 +1,5 @@
 # LemonEngine
 
-### Fork of [BlockEngine](https://github.com/Zalthen-dev/BlockEngine)
-
 ---
 
 <img src="repo/card.svg"/>
