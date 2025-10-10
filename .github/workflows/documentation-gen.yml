@@ -28,7 +28,7 @@ jobs:
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          echo "Using branch name: $BRANCH_NAME"
+          echo "Using the branch name: $BRANCH_NAME"
 
       - name: Generate documentation
         run: |
