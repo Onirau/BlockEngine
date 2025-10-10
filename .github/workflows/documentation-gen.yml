@@ -25,10 +25,7 @@ jobs:
           python-version: "3.11"
 
       - name: Set branch name
-        run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          echo "Using the branch name: $BRANCH_NAME"
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Generate documentation
         run: |
