@@ -10,7 +10,7 @@ struct Script : public LuaSourceContainer {
     Script();
     virtual ~Script() = default;
 
-    virtual bool IsA(const std::string& className) const override;
+    virtual bool IsA(const std::string &className) const override;
 };
 
-void Script_Bind(lua_State* L);
+void Script_Bind(lua_State *L);

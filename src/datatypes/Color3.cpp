@@ -25,20 +25,18 @@ Color3 Color3::fromHSV(float h, float s, float v) {
     }
 }
 
-Color3 Color3::Lerp(const Color3& other, float alpha) const {
+Color3 Color3::Lerp(const Color3 &other, float alpha) const {
     alpha = std::clamp(alpha, 0.0f, 1.0f);
-    return Color3(
-        r + (other.r - r) * alpha,
-        g + (other.g - g) * alpha,
-        b + (other.b - b) * alpha);
+    return Color3(r + (other.r - r) * alpha, g + (other.g - g) * alpha,
+                  b + (other.b - b) * alpha);
 }
 
-static int Color3_new(lua_State* L) {
+static int Color3_new(lua_State *L) {
     float r = (float)luaL_checknumber(L, 1);
     float g = (float)luaL_checknumber(L, 2);
     float b = (float)luaL_checknumber(L, 3);
 
-    Color3* c = (Color3*)lua_newuserdata(L, sizeof(Color3));
+    Color3 *c = (Color3 *)lua_newuserdata(L, sizeof(Color3));
     *c = Color3(r, g, b);
 
     luaL_getmetatable(L, "Color3Meta");
@@ -46,12 +44,12 @@ static int Color3_new(lua_State* L) {
     return 1;
 }
 
-static int Color3_fromRGB(lua_State* L) {
+static int Color3_fromRGB(lua_State *L) {
     int r = luaL_checkinteger(L, 1);
     int g = luaL_checkinteger(L, 2);
     int b = luaL_checkinteger(L, 3);
 
-    Color3* c = (Color3*)lua_newuserdata(L, sizeof(Color3));
+    Color3 *c = (Color3 *)lua_newuserdata(L, sizeof(Color3));
     *c = Color3::fromRGB(r, g, b);
 
     luaL_getmetatable(L, "Color3Meta");
@@ -59,12 +57,12 @@ static int Color3_fromRGB(lua_State* L) {
     return 1;
 }
 
-static int Color3_fromHSV(lua_State* L) {
+static int Color3_fromHSV(lua_State *L) {
     float h = (float)luaL_checknumber(L, 1);
     float s = (float)luaL_checknumber(L, 2);
     float v = (float)luaL_checknumber(L, 3);
 
-    Color3* c = (Color3*)lua_newuserdata(L, sizeof(Color3));
+    Color3 *c = (Color3 *)lua_newuserdata(L, sizeof(Color3));
     *c = Color3::fromHSV(h, s, v);
 
     luaL_getmetatable(L, "Color3Meta");
@@ -72,8 +70,8 @@ static int Color3_fromHSV(lua_State* L) {
     return 1;
 }
 
-static int Color3_toRGB(lua_State* L) {
-    Color3* c = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
+static int Color3_toRGB(lua_State *L) {
+    Color3 *c = (Color3 *)luaL_checkudata(L, 1, "Color3Meta");
 
     lua_pushinteger(L, (int)(c->r * 255.0f));
     lua_pushinteger(L, (int)(c->g * 255.0f));
@@ -81,12 +79,12 @@ static int Color3_toRGB(lua_State* L) {
     return 3;
 }
 
-static int Color3_lerp(lua_State* L) {
-    Color3* a = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
-    Color3* b = (Color3*)luaL_checkudata(L, 2, "Color3Meta");
+static int Color3_lerp(lua_State *L) {
+    Color3 *a = (Color3 *)luaL_checkudata(L, 1, "Color3Meta");
+    Color3 *b = (Color3 *)luaL_checkudata(L, 2, "Color3Meta");
     float alpha = (float)luaL_checknumber(L, 3);
 
-    Color3* result = (Color3*)lua_newuserdata(L, sizeof(Color3));
+    Color3 *result = (Color3 *)lua_newuserdata(L, sizeof(Color3));
     *result = a->Lerp(*b, alpha);
 
     luaL_getmetatable(L, "Color3Meta");
@@ -94,17 +92,17 @@ static int Color3_lerp(lua_State* L) {
     return 1;
 }
 
-static int Color3_tostring(lua_State* L) {
-    Color3* c = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
+static int Color3_tostring(lua_State *L) {
+    Color3 *c = (Color3 *)luaL_checkudata(L, 1, "Color3Meta");
     lua_pushfstring(L, "Color3(%.3f, %.3f, %.3f)", c->r, c->g, c->b);
     return 1;
 }
 
-static int Color3_add(lua_State* L) {
-    Color3* a = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
-    Color3* b = (Color3*)luaL_checkudata(L, 2, "Color3Meta");
+static int Color3_add(lua_State *L) {
+    Color3 *a = (Color3 *)luaL_checkudata(L, 1, "Color3Meta");
+    Color3 *b = (Color3 *)luaL_checkudata(L, 2, "Color3Meta");
 
-    Color3* result = (Color3*)lua_newuserdata(L, sizeof(Color3));
+    Color3 *result = (Color3 *)lua_newuserdata(L, sizeof(Color3));
     *result = Color3(a->r + b->r, a->g + b->g, a->b + b->b);
 
     luaL_getmetatable(L, "Color3Meta");
@@ -112,11 +110,11 @@ static int Color3_add(lua_State* L) {
     return 1;
 }
 
-static int Color3_mul(lua_State* L) {
-    Color3* a = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
+static int Color3_mul(lua_State *L) {
+    Color3 *a = (Color3 *)luaL_checkudata(L, 1, "Color3Meta");
     float s = (float)luaL_checknumber(L, 2);
 
-    Color3* result = (Color3*)lua_newuserdata(L, sizeof(Color3));
+    Color3 *result = (Color3 *)lua_newuserdata(L, sizeof(Color3));
     *result = Color3(a->r * s, a->g * s, a->b * s);
 
     luaL_getmetatable(L, "Color3Meta");
@@ -124,16 +122,18 @@ static int Color3_mul(lua_State* L) {
     return 1;
 }
 
-static int Color3_eq(lua_State* L) {
-    Color3* a = (Color3*)luaL_checkudata(L, 1, "Color3Meta");
-    Color3* b = (Color3*)luaL_checkudata(L, 2, "Color3Meta");
+static int Color3_eq(lua_State *L) {
+    Color3 *a = (Color3 *)luaL_checkudata(L, 1, "Color3Meta");
+    Color3 *b = (Color3 *)luaL_checkudata(L, 2, "Color3Meta");
 
-    lua_pushboolean(L, std::fabs(a->r - b->r) < 1e-6f && std::fabs(a->g - b->g) < 1e-6f && std::fabs(a->b - b->b) < 1e-6f);
+    lua_pushboolean(L, std::fabs(a->r - b->r) < 1e-6f &&
+                           std::fabs(a->g - b->g) < 1e-6f &&
+                           std::fabs(a->b - b->b) < 1e-6f);
     return 1;
 }
 
-void Color3_Bind(lua_State* L) {
-    //Metatable
+void Color3_Bind(lua_State *L) {
+    // Metatable
     luaL_newmetatable(L, "Color3Meta");
 
     lua_pushcfunction(L, Color3_tostring, "__tostring");

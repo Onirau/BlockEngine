@@ -1,22 +1,25 @@
 #include "Signal.h"
 
-void Signal::ConnectLua(lua_State* state, int funcIndex) {
-    if (!state) return;
-    if (!L) L = state;
+void Signal::ConnectLua(lua_State *state, int funcIndex) {
+    if (!state)
+        return;
+    if (!L)
+        L = state;
     lua_pushvalue(state, funcIndex);
     int ref = lua_ref(state, LUA_REGISTRYINDEX);
     LuaConnections.push_back(ref);
 }
 
-void Signal::Connect(const std::function<void(Instance*)>& cb) {
+void Signal::Connect(const std::function<void(Instance *)> &cb) {
     CppConnections.push_back(cb);
 }
 
-void Signal::Fire(const std::string& s) {
-    //for (auto& cb : CppConnections)
-    //    cb();
+void Signal::Fire(const std::string &s) {
+    // for (auto& cb : CppConnections)
+    //     cb();
 
-    if (!L) return;
+    if (!L)
+        return;
     for (int ref : LuaConnections) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
         lua_pushstring(L, s.c_str());
@@ -27,17 +30,18 @@ void Signal::Fire(const std::string& s) {
     }
 }
 
-void Signal::Fire(Instance* inst) {
-    for (auto& cb : CppConnections)
+void Signal::Fire(Instance *inst) {
+    for (auto &cb : CppConnections)
         cb(inst);
 
-    if (!L) return;
+    if (!L)
+        return;
     for (int ref : LuaConnections) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
 
-        //This is a bit of a hack, but it works for now
-        //We need to push the instance to the stack
-        Instance** udata = (Instance**)lua_newuserdata(L, sizeof(Instance*));
+        // This is a bit of a hack, but it works for now
+        // We need to push the instance to the stack
+        Instance **udata = (Instance **)lua_newuserdata(L, sizeof(Instance *));
         *udata = inst;
         luaL_getmetatable(L, "Instance");
         lua_setmetatable(L, -2);

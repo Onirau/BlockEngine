@@ -1,6 +1,6 @@
 #include "ModuleScript.h"
-#include "../core/LuaClassBinder.h"
 #include "../core/LuaBindings.h"
+#include "../core/LuaClassBinder.h"
 #include "../datatypes/Task.h"
 #include <fstream>
 #include <sstream>
@@ -10,20 +10,22 @@ ModuleScript::ModuleScript() : LuaSourceContainer("ModuleScript") {
 }
 
 ModuleScript::~ModuleScript() {
-    //Clean up the module reference if it exists
+    // Clean up the module reference if it exists
     if (ModuleRef != LUA_NOREF && LuaSourceContainer::Enabled) {
-        //Note: We need the lua_State to unref, but we don't store it
-        //In a real implementation, you might want to store the L or use a global
+        // Note: We need the lua_State to unref, but we don't store it
+        // In a real implementation, you might want to store the L or use a
+        // global
     }
 }
 
-int ModuleScript::Require(lua_State* L) {
+int ModuleScript::Require(lua_State *L) {
     if (!Enabled) {
-        luaL_error(L, "Cannot require disabled ModuleScript '%s'", Name.c_str());
+        luaL_error(L, "Cannot require disabled ModuleScript '%s'",
+                   Name.c_str());
         return 0;
     }
 
-    //If already loaded, return cached result
+    // If already loaded, return cached result
     if (Loaded && ModuleRef != LUA_NOREF) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, ModuleRef);
         return 1;
@@ -31,91 +33,103 @@ int ModuleScript::Require(lua_State* L) {
 
     std::string scriptSource = Source;
 
-    //If Source is empty but SourcePath is set, load from file
+    // If Source is empty but SourcePath is set, load from file
     if (scriptSource.empty() && !SourcePath.empty()) {
         if (!LoadFromPath()) {
-            luaL_error(L, "Failed to load ModuleScript from path: %s", SourcePath.c_str());
+            luaL_error(L, "Failed to load ModuleScript from path: %s",
+                       SourcePath.c_str());
             return 0;
         }
         scriptSource = Source;
     }
 
-    //If still empty, error
+    // If still empty, error
     if (scriptSource.empty()) {
         luaL_error(L, "ModuleScript '%s' has no source code", Name.c_str());
         return 0;
     }
 
-    //Compile the script
+    // Compile the script
     size_t bytecodeSize = 0;
-    char* bytecode = luau_compile(scriptSource.c_str(), scriptSource.size(), nullptr, &bytecodeSize);
+    char *bytecode = luau_compile(scriptSource.c_str(), scriptSource.size(),
+                                  nullptr, &bytecodeSize);
 
     if (!bytecode) {
         luaL_error(L, "Failed to compile ModuleScript '%s'", Name.c_str());
         return 0;
     }
 
-    //Load the bytecode
+    // Load the bytecode
     std::string chunkname = "@" + Name;
     int loadResult = luau_load(L, chunkname.c_str(), bytecode, bytecodeSize, 0);
     free(bytecode);
 
     if (loadResult != 0) {
-        const char* errMsg = lua_tostring(L, -1);
-        luaL_error(L, "Error loading ModuleScript '%s': %s", Name.c_str(), errMsg);
+        const char *errMsg = lua_tostring(L, -1);
+        luaL_error(L, "Error loading ModuleScript '%s': %s", Name.c_str(),
+                   errMsg);
         return 0;
     }
 
-    //Execute the module script (it should return a value)
+    // Execute the module script (it should return a value)
     if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
-        const char* errMsg = lua_tostring(L, -1);
-        luaL_error(L, "Error executing ModuleScript '%s': %s", Name.c_str(), errMsg);
+        const char *errMsg = lua_tostring(L, -1);
+        luaL_error(L, "Error executing ModuleScript '%s': %s", Name.c_str(),
+                   errMsg);
         return 0;
     }
 
-    //Store the returned value in the registry
-    lua_pushvalue(L, -1);//Duplicate the return value
+    // Store the returned value in the registry
+    lua_pushvalue(L, -1); // Duplicate the return value
     ModuleRef = lua_ref(L, LUA_REGISTRYINDEX);
     Loaded = true;
 
-    //Return the module value (still on stack)
+    // Return the module value (still on stack)
     return 1;
 }
 
-bool ModuleScript::IsA(const std::string& className) const {
+bool ModuleScript::IsA(const std::string &className) const {
     return this->ClassName == className || LuaSourceContainer::IsA(className);
 }
 
-void ModuleScript_Bind(lua_State* L) {
+void ModuleScript_Bind(lua_State *L) {
     LuaClassBinder::RegisterClass("ModuleScript", "LuaSourceContainer");
 
-    //LinkedSource property (read-only, always returns empty for now)
-    LuaClassBinder::AddProperty("ModuleScript", "LinkedSource", [](lua_State* L, Instance* inst) -> int {
+    // LinkedSource property (read-only, always returns empty for now)
+    LuaClassBinder::AddProperty(
+        "ModuleScript", "LinkedSource",
+        [](lua_State *L, Instance *inst) -> int {
             lua_pushstring(L, "");
-            return 1; },
-                                nullptr);//Read-only
+            return 1;
+        },
+        nullptr); // Read-only
 
-    //Set constructor
-    LuaClassBinder::SetConstructor("ModuleScript", []() -> Instance* {
-        ModuleScript* module = new ModuleScript();
+    // Set constructor
+    LuaClassBinder::SetConstructor("ModuleScript", []() -> Instance * {
+        ModuleScript *module = new ModuleScript();
         return module;
     });
 
-    //Create global require function
-    lua_pushcfunction(L, [](lua_State* L) -> int {
-        // Check if argument is a ModuleScript instance
-        if (!lua_isuserdata(L, 1)) {
-            luaL_error(L, "require expects a ModuleScript");
-            return 0;
-        }
+    // Create global require function
+    lua_pushcfunction(
+        L,
+        [](lua_State *L) -> int {
+            // Check if argument is a ModuleScript instance
+            if (!lua_isuserdata(L, 1)) {
+                luaL_error(L, "require expects a ModuleScript");
+                return 0;
+            }
 
-        Instance* inst = LuaClassBinder::CheckInstance(L, 1);
-        if (!inst->IsA("ModuleScript")) {
-            luaL_error(L, "require expects a ModuleScript, got %s", inst->ClassName.c_str());
-            return 0;
-        }
+            Instance *inst = LuaClassBinder::CheckInstance(L, 1);
+            if (!inst->IsA("ModuleScript")) {
+                luaL_error(L, "require expects a ModuleScript, got %s",
+                           inst->ClassName.c_str());
+                return 0;
+            }
 
-        ModuleScript* module = static_cast<ModuleScript*>(inst);
-        return module->Require(L); }, "require");
+            ModuleScript *module = static_cast<ModuleScript *>(inst);
+            return module->Require(L);
+        },
+        "require");
     lua_setglobal(L, "require");
 }

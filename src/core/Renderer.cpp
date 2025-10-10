@@ -1,19 +1,17 @@
 #include "Renderer.h"
 
-//TODO: add shadows and lights
+// TODO: add shadows and lights
 const int SHADOW_MAP_SIZE = 1024;
 
 Texture2D g_defaultTexture;
 
-static Color Color3ToColor(const Color3& c) {
-    return Color{
-        (unsigned char)roundf(c.r * 255.0f),
-        (unsigned char)roundf(c.g * 255.0f),
-        (unsigned char)roundf(c.b * 255.0f),
-        255};
+static Color Color3ToColor(const Color3 &c) {
+    return Color{(unsigned char)roundf(c.r * 255.0f),
+                 (unsigned char)roundf(c.g * 255.0f),
+                 (unsigned char)roundf(c.b * 255.0f), 255};
 }
 
-//Implementation - NO default arguments here
+// Implementation - NO default arguments here
 Texture2D GenerateDefaultTexture(int width, int height) {
     Image img = GenImageColor(width, height, BLANK);
 
@@ -44,7 +42,7 @@ void DrawPart(const Part part) {
 
     Color color = Color3ToColor(part.Color);
 
-    Model* model = nullptr;
+    Model *model = nullptr;
 
     Vector3 pos = {0, 0, 0};
     Vector3 size = {1, 1, 1};
@@ -64,21 +62,23 @@ void DrawPart(const Part part) {
     }
 
     if (model) {
-        model->materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = g_defaultTexture;
+        model->materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+            g_defaultTexture;
         DrawModel(*model, {0, 0, 0}, 1.0f, color);
     }
 
     rlPopMatrix();
 }
 
-void RenderScene(Camera3D camera, const std::vector<BasePart*> instances) {
+void RenderScene(Camera3D camera, const std::vector<BasePart *> instances) {
     BeginMode3D(camera);
     DrawSkybox();
 
-    for (BasePart* inst : instances) {
+    for (BasePart *inst : instances) {
         if (inst->ClassName == "Part") {
-            Part* p = dynamic_cast<Part*>(inst);
-            if (p) DrawPart(*p);
+            Part *p = dynamic_cast<Part *>(inst);
+            if (p)
+                DrawPart(*p);
         }
     }
 

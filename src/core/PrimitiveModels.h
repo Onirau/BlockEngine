@@ -1,8 +1,8 @@
 #pragma once
 #include "raylib.h"
 #include "raymath.h"
-#include <unordered_map>
 #include <cstring>
+#include <unordered_map>
 
 enum class PrimitiveShape {
     Block,
@@ -14,4 +14,4 @@ enum class PrimitiveShape {
 
 void InitPrimitiveModels();
 void UnloadPrimitiveModels();
-Model* GetPrimitiveModel(PrimitiveShape shape);
+Model *GetPrimitiveModel(PrimitiveShape shape);

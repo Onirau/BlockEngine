@@ -1,14 +1,14 @@
 #pragma once
 
+#include "../core/Signal.h"
+#include <algorithm>
+#include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <functional>
 #include <vector>
-#include <memory>
-#include <algorithm>
-#include "../core/Signal.h"
 
-//Forward declaration for Lua
+// Forward declaration for Lua
 struct lua_State;
 
 struct Object {
@@ -20,11 +20,11 @@ struct Object {
     Signal Changed;
 
     //-- Methods --//
-    Object(const std::string& className = "Object");
+    Object(const std::string &className = "Object");
     virtual ~Object();
-    virtual bool IsA(const std::string& className) const;
-    virtual void FirePropertyChanged(const std::string& propertyName);
+    virtual bool IsA(const std::string &className) const;
+    virtual void FirePropertyChanged(const std::string &propertyName);
 };
 
-//Lua binding function declaration
-void Object_Bind(lua_State* L);
+// Lua binding function declaration
+void Object_Bind(lua_State *L);

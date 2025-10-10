@@ -1,14 +1,14 @@
 #pragma once
 
-#include <vector>
-#include <variant>
 #include <memory>
 #include <optional>
+#include <variant>
+#include <vector>
 
-#include "Object.h"
 #include "../core/Signal.h"
-#include "../datatypes/Vector3.h"
 #include "../datatypes/Color3.h"
+#include "../datatypes/Vector3.h"
+#include "Object.h"
 
 struct Attribute {
     std::string Name;
@@ -17,8 +17,8 @@ struct Attribute {
 
 struct Instance : public Object {
     //-- Properties --//
-    Instance* Parent = nullptr;
-    std::vector<Instance*> Children;
+    Instance *Parent = nullptr;
+    std::vector<Instance *> Children;
     std::vector<Attribute> Attributes;
 
     bool Archivable = true;
@@ -34,41 +34,41 @@ struct Instance : public Object {
     Signal Destroying;
 
     //-- Methods --//
-    Instance(const std::string& className = "Instance");
+    Instance(const std::string &className = "Instance");
     virtual ~Instance();
 
-    void AddTag(std::string& tag);
-    //GetTags();
-    bool HasTag(std::string& tag);
-    void RemoveTag(std::string& tag);
+    void AddTag(std::string &tag);
+    // GetTags();
+    bool HasTag(std::string &tag);
+    void RemoveTag(std::string &tag);
 
-    std::optional<Attribute> GetAttribute(std::string& attribute);
+    std::optional<Attribute> GetAttribute(std::string &attribute);
     std::vector<Attribute> GetAttributes();
-    void SetAttribute(std::string& attribute, Attribute value);
+    void SetAttribute(std::string &attribute, Attribute value);
 
-    std::optional<Instance*> FindFirstAncestor(std::string& name);
-    std::optional<Instance*> FindFirstAncestorOfClass(std::string& className);
-    std::optional<Instance*> FindFirstAncestorWhichIsA(std::string& className);
-    std::optional<Instance*> FindFirstChild(std::string& name);
-    std::optional<Instance*> FindFirstChildOfClass(std::string& name);
-    std::optional<Instance*> FindFirstChildWhichIsA(std::string& name);
-    std::optional<Instance*> FindFirstDescendant(std::string& name);
+    std::optional<Instance *> FindFirstAncestor(std::string &name);
+    std::optional<Instance *> FindFirstAncestorOfClass(std::string &className);
+    std::optional<Instance *> FindFirstAncestorWhichIsA(std::string &className);
+    std::optional<Instance *> FindFirstChild(std::string &name);
+    std::optional<Instance *> FindFirstChildOfClass(std::string &name);
+    std::optional<Instance *> FindFirstChildWhichIsA(std::string &name);
+    std::optional<Instance *> FindFirstDescendant(std::string &name);
 
-    std::vector<Instance*> GetChildren();
-    std::vector<Instance*> GetDescendants();
+    std::vector<Instance *> GetChildren();
+    std::vector<Instance *> GetDescendants();
 
-    bool IsAncestorOf(Instance* descendant);
-    bool IsDescendantOf(Instance* ancestor);
+    bool IsAncestorOf(Instance *descendant);
+    bool IsDescendantOf(Instance *ancestor);
 
     void ClearAllChildren();
     void Destroy();
-    //Clone();
+    // Clone();
 
-    void SetParent(Instance* newParent);
-    void AddChild(Instance* child);
-    void RemoveChild(Instance* child);
+    void SetParent(Instance *newParent);
+    void AddChild(Instance *child);
+    void RemoveChild(Instance *child);
 
-    virtual bool IsA(const std::string& className) const;
+    virtual bool IsA(const std::string &className) const;
 };
 
-void Class_Instance_Bind(lua_State* L);
+void Class_Instance_Bind(lua_State *L);

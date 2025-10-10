@@ -2,16 +2,16 @@
 #include <climits>
 #include <cstring>
 
-#include "../datatypes/Vector3.h"
 #include "../datatypes/Color3.h"
+#include "../datatypes/Vector3.h"
 
 #include "../core/Signal.h"
 
 #include "Instance.h"
 
+#include "../../luau/Compiler/include/luacode.h"
 #include "../../luau/VM/include/lua.h"
 #include "../../luau/VM/include/lualib.h"
-#include "../../luau/Compiler/include/luacode.h"
 
 struct BasePart : public Instance {
     //-- Properties --//
@@ -32,21 +32,20 @@ struct BasePart : public Instance {
     Color3 Color = Color3{163.f / 255, 162.f / 255, 165.f / 255};
     bool CastShadow = true;
     float Transparency = 0;
-    //Material
+    // Material
 
     //-- Events --//
     Signal Touched;
     Signal TouchEnded;
-
 
     //-- Methods --//
 
     virtual ~BasePart() = default;
 
     double GetMass();
-    virtual bool IsA(const std::string& className) const;
+    virtual bool IsA(const std::string &className) const;
 };
 
-//Binding
+// Binding
 
-void BasePart_Bind(lua_State* L);
+void BasePart_Bind(lua_State *L);
