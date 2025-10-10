@@ -1,3 +1,4 @@
+import argparse
 import re
 import json
 import sys
@@ -682,21 +683,21 @@ class HTMLGenerator:
 
 
 def main():
-    if len(sys.argv) < 2:
-        sys.exit(1)
-    
-    command = sys.argv[1]
-    
+    parser = argparse.ArgumentParser(description="Generate documentation")
+    parser.add_argument("command", choices=["extract", "generate", "all"], help="Command to run")
+    parser.add_argument("--output", "-o", default="docs", help="Output directory for generated HTML")
+    args = parser.parse_args()
+
     src_dir = "src"
     json_file = "scripts/documentation/api-dump.json"
-    output_dir = "docs"
+    output_dir = args.output
     templates_dir = "scripts/documentation/templates"
-    
-    if command == "extract":
+
+    if args.command == "extract":
         extractor = CommentExtractor(src_dir, json_file)
         extractor.extract()
-    
-    elif command == "generate":
+
+    elif args.command == "generate":
         if not Path(json_file).exists():
             print(f"Error: {json_file} not found!")
             print("Run 'python doc_tool.py extract' first")
@@ -704,19 +705,13 @@ def main():
         
         generator = HTMLGenerator(json_file, output_dir, templates_dir)
         generator.generate()
-    
-    elif command == "all":
+
+    elif args.command == "all":
         extractor = CommentExtractor(src_dir, json_file)
         extractor.extract()
-        
         print("\n")
-        
         generator = HTMLGenerator(json_file, output_dir, templates_dir)
         generator.generate()
-    
-    else:
-        print(f"Unknown command: {command}")
-        sys.exit(1)
 
 if __name__ == "__main__":
     main()
