@@ -5,7 +5,7 @@
 
 DataModel *DataModel::Instance = nullptr;
 
-DataModel::DataModel() : ::Instance("DataModel") {
+DataModel::DataModel() : ServiceProvider("DataModel") {
     Name = "game";
     Instance = this;
     InitializeServices();
@@ -24,39 +24,20 @@ DataModel *DataModel::GetInstance() {
     return Instance;
 }
 
-::Instance *DataModel::GetService(const std::string &serviceName) {
-    auto it = Services.find(serviceName);
-    if (it != Services.end()) {
-        return it->second;
-    }
-
-    // Create service if it doesn't exist
+::Instance *DataModel::CreateService(const std::string &serviceName) {
     ::Instance *service = nullptr;
 
     if (serviceName == "Workspace") {
         service = new Workspace();
-    }
-
-    if (service) {
-        RegisterService(serviceName, service);
-        service->SetParent(this);
-    }
-
-    return service;
-}
-
-::Instance *DataModel::FindService(const std::string &serviceName) {
-    auto it = Services.find(serviceName);
-    return (it != Services.end()) ? it->second : nullptr;
-}
-
-void DataModel::RegisterService(const std::string &name, ::Instance *service) {
-    Services[name] = service;
-
-    // Cache commonly used services
-    if (name == "Workspace") {
+        // Cache commonly used services
         WorkspaceService = dynamic_cast<Workspace *>(service);
     }
+    // Add more services here as needed
+    // else if (serviceName == "Players") {
+    //     service = new Players();
+    // }
+
+    return service;
 }
 
 void DataModel::InitializeServices() {
@@ -66,38 +47,12 @@ void DataModel::InitializeServices() {
     WorkspaceService->SetParent(this);
 }
 
+bool DataModel::IsA(const std::string &className) const {
+    return className == "DataModel" || ServiceProvider::IsA(className);
+}
+
 void DataModel::Bind(lua_State *L) {
-    LuaClassBinder::RegisterClass("DataModel", "Instance");
-
-    // GetService method
-    LuaClassBinder::AddMethod(
-        "DataModel", "GetService", [](lua_State *L, ::Instance *inst) -> int {
-            auto *dm = static_cast<DataModel *>(inst);
-            const char *serviceName = luaL_checkstring(L, 2);
-
-            ::Instance *service = dm->GetService(std::string(serviceName));
-            if (service) {
-                LuaClassBinder::PushInstance(L, service);
-            } else {
-                lua_pushnil(L);
-            }
-            return 1;
-        });
-
-    // FindService method
-    LuaClassBinder::AddMethod(
-        "DataModel", "FindService", [](lua_State *L, ::Instance *inst) -> int {
-            auto *dm = static_cast<DataModel *>(inst);
-            const char *serviceName = luaL_checkstring(L, 2);
-
-            ::Instance *service = dm->FindService(std::string(serviceName));
-            if (service) {
-                LuaClassBinder::PushInstance(L, service);
-            } else {
-                lua_pushnil(L);
-            }
-            return 1;
-        });
+    LuaClassBinder::RegisterClass("DataModel", "ServiceProvider");
 
     // Create global 'game' variable
     DataModel *dm = DataModel::GetInstance();

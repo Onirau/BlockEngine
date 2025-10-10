@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Instance.h"
+#include "ServiceProvider.h"
 #include <memory>
-#include <unordered_map>
 
 #include "../../luau/Compiler/include/luacode.h"
 #include "../../luau/VM/include/lua.h"
@@ -16,10 +15,10 @@ struct Workspace;
  *
  * @description
  * DataModel represents the top-level container in the instance hierarchy.
- * It manages all game services like Workspace and provides access to them.
- * Typically accessed via the global `game` variable in Lua.
+ * It inherits from ServiceProvider and manages all game services like
+ * Workspace. Typically accessed via the global `game` variable in Lua.
  *
- * @inherits Instance
+ * @inherits ServiceProvider
  *
  * @example
  * ```lua
@@ -28,47 +27,20 @@ struct Workspace;
  * part.Parent = workspace
  * ```
  */
-struct DataModel : public Instance {
+struct DataModel : public ServiceProvider {
     static DataModel *Instance;
-
-    std::unordered_map<std::string, ::Instance *> Services;
 
     Workspace *WorkspaceService = nullptr;
 
     DataModel();
     virtual ~DataModel();
 
-    /**
-     * @method GetInstance
-     * @internal
-     * @returns DataModel
-     * @description Returns the singleton DataModel instance
-     */
     static DataModel *GetInstance();
+    virtual ::Instance *CreateService(const std::string &serviceName) override;
 
-    /**
-     * @method GetService
-     * @param serviceName string
-     * @returns Instance
-     * @description Gets a service by name, creating it if it doesn't exist
-     *
-     * @example
-     * ```lua
-     * local workspace = game:GetService("Workspace")
-     * ```
-     */
-    ::Instance *GetService(const std::string &serviceName);
-
-    /**
-     * @method FindService
-     * @param serviceName string
-     * @returns Instance | nil
-     * @description Finds a service by name without creating it
-     */
-    ::Instance *FindService(const std::string &serviceName);
-
-    void RegisterService(const std::string &name, ::Instance *service);
     void InitializeServices();
+
+    virtual bool IsA(const std::string &className) const override;
 
     static void Bind(lua_State *L);
 };
