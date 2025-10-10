@@ -14,6 +14,8 @@
 #include "../instances/Part.h"
 #include "../instances/Instance.h"
 #include "../instances/LuaSourceContainer.h"
+#include "../instances/Script.h"
+#include "../instances/ModuleScript.h"
 
 #include "Signal.h"
 #include "../Global.h"

@@ -14,7 +14,7 @@ part2.Shape = "Block"
 part2.Parent = part1
 
 -- try making a lua source
-local script = Instance.new("LuaSourceContainer")
+local script = Instance.new("Script")
 script.Name = "MyScript"
 script.Source = "print('Hello from script!')"
 script.Enabled = true

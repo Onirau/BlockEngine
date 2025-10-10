@@ -119,6 +119,9 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
     Instance* inst = CheckInstance(L, 1);
     const char* key = luaL_checkstring(L, 2);
 
+    printf("GenericIndex called: object class='%s', looking for key='%s'\n",
+           inst->ClassName.c_str(), key);
+
     //Walk up the inheritance chain
     std::string currentClass = inst->ClassName;
     std::vector<std::string> checked;
@@ -132,9 +135,13 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
             break;
         }
 
+        printf("  Checking class '%s' (has %zu properties, %zu methods)\n",
+               currentClass.c_str(), desc->properties.size(), desc->methods.size());
+
         //Check properties FIRST
         auto propIt = desc->properties.find(key);
         if (propIt != desc->properties.end()) {
+            printf("  FOUND property '%s' in class '%s'\n", key, currentClass.c_str());
             if (propIt->second.getter) {
                 return propIt->second.getter(L, inst);
             } else {
@@ -145,6 +152,7 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
         //Check methods
         auto methodIt = desc->methods.find(key);
         if (methodIt != desc->methods.end()) {
+            printf("  FOUND method '%s' in class '%s'\n", key, currentClass.c_str());
             //Push instance as light userdata
             lua_pushlightuserdata(L, inst);
             //Store method name
@@ -155,6 +163,8 @@ int LuaClassBinder::GenericIndex(lua_State* L) {
         }
 
         currentClass = desc->parentClassName;
+        printf("  Not found in '%s', moving to parent '%s'\n",
+               checked.back().c_str(), currentClass.c_str());
     }
 
     printf("  Property/method '%s' not found in hierarchy: ", key);
@@ -237,6 +247,9 @@ std::string LuaClassBinder::GetMetatableName(const std::string& className) {
 
 void LuaClassBinder::CreateMetatable(lua_State* L, const std::string& className) {
     std::string metaName = GetMetatableName(className);
+    printf("  CreateMetatable: Creating '%s' for class '%s'\n",
+           metaName.c_str(), className.c_str());
+
     luaL_newmetatable(L, metaName.c_str());
 
     lua_pushcfunction(L, GenericIndex, "__index");
@@ -258,10 +271,13 @@ void LuaClassBinder::CreateMetatable(lua_State* L, const std::string& className)
     auto* desc = GetDescriptor(className);
     if (desc && !desc->parentClassName.empty()) {
         std::string parentMeta = GetMetatableName(desc->parentClassName);
+        printf("    Setting parent metatable '%s'\n", parentMeta.c_str());
         luaL_getmetatable(L, parentMeta.c_str());
         if (!lua_isnil(L, -1)) {
             lua_setmetatable(L, -2);
+            printf("    Parent metatable set successfully\n");
         } else {
+            printf("    WARNING: Parent metatable '%s' not found!\n", parentMeta.c_str());
             lua_pop(L, 1);//Pop the nil
         }
     }
@@ -270,8 +286,19 @@ void LuaClassBinder::CreateMetatable(lua_State* L, const std::string& className)
 }
 
 void LuaClassBinder::BindAll(lua_State* L) {
+    printf("=== LuaClassBinder::BindAll starting ===\n");
+    printf("Total classes registered: %zu\n", s_classes.size());
+
+    //Print all registered classes first
+    for (const auto& [className, desc] : s_classes) {
+        printf("  Class '%s' -> parent '%s' (%zu props, %zu methods)\n",
+               className.c_str(),
+               desc.parentClassName.c_str(),
+               desc.properties.size(),
+               desc.methods.size());
+    }
+
     //Create metatables in order (parents before children)
-    //Simple approach: iterate multiple times until all are created
     std::unordered_set<std::string> created;
     bool progress = true;
 
@@ -282,6 +309,7 @@ void LuaClassBinder::BindAll(lua_State* L) {
 
             //Check if parent is created (or no parent)
             if (desc.parentClassName.empty() || created.count(desc.parentClassName)) {
+                printf("Creating metatable for '%s'\n", className.c_str());
                 CreateMetatable(L, className);
                 created.insert(className);
                 progress = true;
@@ -289,9 +317,23 @@ void LuaClassBinder::BindAll(lua_State* L) {
         }
     }
 
+    if (created.size() < s_classes.size()) {
+        printf("WARNING: Not all classes were bound! Created %zu of %zu\n",
+               created.size(), s_classes.size());
+        for (const auto& [className, desc] : s_classes) {
+            if (!created.count(className)) {
+                printf("  MISSING: %s (parent: %s)\n",
+                       className.c_str(), desc.parentClassName.c_str());
+            }
+        }
+    }
+
     //Create Instance.new()
+    printf("Creating Instance.new() constructor\n");
     lua_newtable(L);
     lua_pushcfunction(L, GenericConstructor, "new");
     lua_setfield(L, -2, "new");
     lua_setglobal(L, "Instance");
+
+    printf("=== LuaClassBinder::BindAll complete ===\n");
 }

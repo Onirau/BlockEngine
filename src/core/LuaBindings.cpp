@@ -6,6 +6,8 @@
 #include "../instances/DataModel.h"
 #include "../instances/Workspace.h"
 #include "../instances/LuaSourceContainer.h"
+#include "../instances/Script.h"
+#include "../instances/ModuleScript.h"
 
 #include "LuaClassBinder.h"
 
@@ -84,10 +86,13 @@ void RegisterScriptBindings(lua_State* L, std::vector<BasePart*>& parts, Camera3
     Task_Bind(L);
 
     //Register instance classes using LuaClassBinder
-    Class_Instance_Bind(L);//Base Instance class
+    Object_Bind(L);//Base Object Class
+    Class_Instance_Bind(L);//Instance inherits from Object
     BasePart_Bind(L);//BasePart inherits from Instance
     Part_Bind(L);//Part inherits from BasePart
     LuaSourceContainer_Bind(L);//LuaSourceContainer inherits from Instance
+    Script_Bind(L);//Script inherits from LuaSourceContainer
+    ModuleScript_Bind(L);//ModuleScript inherits from LuaSourceContainer
 
     //Register services
     DataModel::Bind(L);//Creates 'game' global
