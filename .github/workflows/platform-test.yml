@@ -63,28 +63,36 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Install CMake
+      
+      - name: Install CMake and Ninja
         uses: jwlawson/actions-setup-cmake@v1
         with:
           cmake-version: "3.27.0"
-
+      
+      - name: Install Ninja
+        run: choco install ninja
+      
       - name: Setup sccache
         uses: mozilla-actions/sccache-action@v0.0.3
-
+      
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v1.1
+      
       - name: Clone dependencies
         run: |
           mkdir dependencies -Force
           git clone --depth 1 https://github.com/luau-lang/luau.git dependencies/luau
           git clone --depth 1 https://github.com/raysan5/raylib.git dependencies/raylib
-
+      
       - name: Configure and build with sccache
+        shell: cmd
         run: |
-          $env:SCCACHE_DIR = "${{ github.workspace }}\.sccache"
-          mkdir build -Force
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          set SCCACHE_DIR=%GITHUB_WORKSPACE%\.sccache
+          mkdir build
           cd build
-          cmake .. -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
           cmake --build . --config Release --parallel
-
+      
       - name: sccache statistics
         run: sccache --show-stats
