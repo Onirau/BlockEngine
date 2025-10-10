@@ -10,7 +10,7 @@
 
 API documentation is available for each branch:
 
-- [Develop Branch Docs](https://onirau.github.io/BlockEngine/develop/)
+- [Develop Branch Docs](https://onirau.github.io/LemonEngine/develop/)
 
 ## Supported Platforms
 
