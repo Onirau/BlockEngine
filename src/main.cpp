@@ -110,8 +110,8 @@ int main(int argc, char **argv) {
     const char *headlessScriptPath = nullptr;
 
     // Simple CLI:
-    //  BlockEngine --run <script.luau>   -> run script
-    //  BlockEngine --test                -> run lua/test_runner.luau (which
+    //  LemonEngine --run <script.luau>   -> run script
+    //  LemonEngine --test                -> run lua/test_runner.luau (which
     //  discovers lua/tests/*.luau) then exit (no window)
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--run") == 0 && i + 1 < argc) {
@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
     }
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(1280, 720, "BlockEngine");
+    InitWindow(1280, 720, "LemonEngine");
     SetTargetFPS(500);
 
     PrepareRenderer();

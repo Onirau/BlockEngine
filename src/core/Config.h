@@ -1,14 +1,14 @@
 #pragma once
 
 // Engine Information
-#define ENGINE_NAME "BlockEngine"
+#define ENGINE_NAME "LemonEngine"
 #define ENGINE_VERSION_MAJOR 0
 #define ENGINE_VERSION_MINOR 1
 #define ENGINE_VERSION_PATCH 0
 #define ENGINE_VERSION_STRING "0.1.0"
 
-#define ENGINE_ORGANIZATION "Zalthen-dev"
-#define ENGINE_WEBSITE "https://github.com/Zalthen-dev/BlockEngine"
+#define ENGINE_ORGANIZATION "Onirau"
+#define ENGINE_WEBSITE "https://github.com/Onirau/LemonEngine"
 
 // Version Helper
 #define ENGINE_VERSION_NUMBER                                                  \

@@ -1,5 +1,5 @@
--- Simple Luau test runner for BlockEngine
--- Usage: BlockEngine --test
+-- Simple Luau test runner for LemonEngine
+-- Usage: LemonEngine --test
 
 -- Test files are currently being injected by C++ as __TEST_FILES = { { path = "...", source = "..." }, ... }
 

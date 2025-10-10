@@ -6,7 +6,7 @@ extern Camera3D g_camera;
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Usage: BlockEngineRuntime <place_file>\n");
+        printf("Usage: LemonEngineRuntime <place_file>\n");
         return 1;
     }
 

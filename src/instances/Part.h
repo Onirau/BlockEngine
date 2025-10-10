@@ -11,7 +11,7 @@ extern const char *validShapes[];
  * @brief A physical 3D part that can be placed in the game world
  *
  * @description
- * Part is the most basic building block in BlockEngine. It represents a
+ * Part is the most basic building block in LemonEngine. It represents a
  * physical object.
  *
  *

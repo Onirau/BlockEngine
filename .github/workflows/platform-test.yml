@@ -1,4 +1,4 @@
-﻿name: BlockEngine CI
+﻿name: LemonEngine CI
 
 on:
   push:

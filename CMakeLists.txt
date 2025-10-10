@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(BlockEngine)
+project(LemonEngine)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -46,14 +46,14 @@ endforeach()
 
 # Editor executable
 file(GLOB EDITOR_SOURCES "src/editor/*.cpp")
-add_executable(BlockEngineEditor ${EDITOR_SOURCES} ${COMMON_SOURCES})
+add_executable(LemonEngineEditor ${EDITOR_SOURCES} ${COMMON_SOURCES})
 
 # Runtime executable
 file(GLOB RUNTIME_SOURCES "src/runtime/*.cpp")
-add_executable(BlockEngineRuntime ${RUNTIME_SOURCES} ${COMMON_SOURCES})
+add_executable(LemonEngineRuntime ${RUNTIME_SOURCES} ${COMMON_SOURCES})
 
 # Include directories for both executables
-foreach(TARGET BlockEngineEditor BlockEngineRuntime)
+foreach(TARGET LemonEngineEditor LemonEngineRuntime)
     target_include_directories(${TARGET} PRIVATE 
         ${DEPS_DIR}/luau/Ast/include
         ${DEPS_DIR}/luau/Config/include

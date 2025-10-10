@@ -1,14 +1,18 @@
-# BlockEngine (Demo)
-<img src="repo/BlockEngineCard.png"/>
-<a href="https://discord.gg/xMPCsx3dNf" style="text-decoration:none;">
-    <img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white&style=for-the-badge" alt="Discord"/>
-</a>
+# LemonEngine
+
+### Fork of [BlockEngine](https://github.com/Zalthen-dev/BlockEngine)
+
+---
+
+<img src="repo/card.svg"/>
 
 ## Supported Platforms
+
 - Linux
 - Windows
 
 ## Dependencies
+
 - [Luau](https://github.com/luau-lang/luau)
 - [Raylib](https://github.com/raysan5/raylib)
 
@@ -17,22 +21,37 @@
 ### Linux
 
 1. **Clone the repository**
-   git clone https://github.com/Zalthen-dev/BlockEngine.git
-   cd BlockEngine
+
+```bash
+   git clone https://github.com/Onirau/LemonEngine.git
+   cd LemonEngine
+```
 
 2. **Clone dependencies**
+
+```bash
    git clone https://github.com/luau-lang/luau.git dependencies/luau
    git clone https://github.com/raysan5/raylib.git dependencies/raylib
+```
 
 3. **Install required system libraries**
+
+```bash
    sudo apt update
    sudo apt install -y build-essential cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxxf86vm-dev
+```
 
 4. **Navigate to the build directory**
+
+```bash
    cd build
+```
 
 5. **Configure the project**
+
+```bash
    cmake ..
+```
 
 6. **Build the project**
    make -j$(nproc)
@@ -42,29 +61,43 @@
 ### Windows
 
 1. **Clone the repository**
-   git clone https://github.com/Zalthen-dev/BlockEngine.git
-   cd BlockEngine
+   git clone https://github.com/Onirau/LemonEngine.git
+   cd LemonEngine
+
+```
 
 2. **Clone dependencies** (temporary; future versions may not require this)
    git clone https://github.com/luau-lang/luau.git dependencies/luau
    git clone https://github.com/raysan5/raylib.git dependencies/raylib
+```
 
 3. **Install CMake and Visual Studio**
 
+````bash
    - Install [CMake](https://cmake.org/download/)
    - Install Visual Studio with "Desktop development with C++" workload
 
 4. **Navigate to build folder**
+```bash
    cd build
+````
 
 5. **Configure the project**
+
+```bash
    cmake ..
+```
 
 6. **Build the project**
+
+```bash
    cmake --build .
+```
 
 ## How to Use
-BlockEngine supports executing a Luau Script by passing it as command-line argument, and with a familiar scripting API, you can create parts and edit them in real time!
+
+LemonEngine supports executing a Luau Script by passing it as command-line argument, and with a familiar scripting API, you can create parts and edit them in real time!
+
 ```luau
 local part1 = Instance.new("Part")
 part1.Color = Color3.new(1,0,0)
@@ -90,16 +123,18 @@ end
 ```
 
 # Checklist
-Below is what you can expect for the future in BlockEngine's development! Expect this big list to expand as time goes on!
+
+Below is what you can expect for the future in LemonEngine's development! Expect this big list to expand as time goes on!
+
 - [ ] Limiting `os` library
 - [ ] Signals in Lua
-- [ ] Instance System
+- [x] Instance System
 - [ ] Physics
 - [ ] Data types
   - [ ] CFrame
   - [ ] Random
   - [ ] game
-  - [ ] workspace
+  - [x] workspace
 - [ ] Services
   - [ ] RunService
   - [ ] Lighting
@@ -110,6 +145,7 @@ Below is what you can expect for the future in BlockEngine's development! Expect
   - [ ] Lights from Instance Lights
 
 # How to Help
-You can help out by using BlockEngine and reporting any bugs you find!
+
+You can help out by using LemonEngine and reporting any bugs you find!
 
 If you know how to code, help out by creating pull requests to add and change code!
