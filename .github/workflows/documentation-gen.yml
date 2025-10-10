@@ -3,12 +3,10 @@
 on:
   push:
     branches:
-      - main
-      - develop
+      - "**" # triggers on any branch
   pull_request:
     branches:
-      - main
-      - develop
+      - "**"
 
 jobs:
   build-docs:
@@ -16,19 +14,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Generate documentation
         run: |
-          python scripts/documentation/doc_tool.py all
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          OUTPUT_DIR=docs/$BRANCH_NAME
+          python scripts/documentation/doc_tool.py all --output $OUTPUT_DIR
 
-      - name: Upload documentation as artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v6
         with:
-          name: html-docs
-          path: docs/
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
