@@ -2,11 +2,15 @@
 
 on:
   push:
-    branches:
-      - "**" # triggers on any branch
+    branches: ["*"]
+    paths:
+      - "src/**"
+      - ".github/workflows/documentation-gen.yml"
   pull_request:
-    branches:
-      - "**"
+    branches: ["*"]
+    paths:
+      - "src/**"
+      - ".github/workflows/documentation-gen.yml"
 
 jobs:
   build-docs:
