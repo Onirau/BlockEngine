@@ -81,18 +81,3 @@ public:
     // Get class descriptor (now public for external access)
     static ClassDescriptor *GetDescriptor(const std::string &className);
 };
-
-// Helper macros for cleaner property registration
-#define LUA_PROPERTY(className, propName, type)                                \
-    LuaClassBinder::AddProperty(                                               \
-        #className, #propName,                                                 \
-        [](lua_State *L, Instance *inst) -> int {                              \
-            auto *obj = static_cast<className *>(inst);                        \
-            /* getter logic */                                                 \
-            return 1;                                                          \
-        },                                                                     \
-        [](lua_State *L, Instance *inst, int valueIdx) -> int {                \
-            auto *obj = static_cast<className *>(inst);                        \
-            /* setter logic */                                                 \
-            return 0;                                                          \
-        })

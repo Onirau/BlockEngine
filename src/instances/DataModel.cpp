@@ -53,9 +53,4 @@ bool DataModel::IsA(const std::string &className) const {
 
 void DataModel::Bind(lua_State *L) {
     LuaClassBinder::RegisterClass("DataModel", "ServiceProvider");
-
-    // Create global 'game' variable
-    DataModel *dm = DataModel::GetInstance();
-    LuaClassBinder::PushInstance(L, dm);
-    lua_setglobal(L, "game");
 }

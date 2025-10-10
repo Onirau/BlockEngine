@@ -47,25 +47,6 @@ public:
     void Run() {
         Initialize();
 
-        workspace->ChildAdded.Connect([](Instance *child) {
-            if (auto *part = dynamic_cast<BasePart *>(child)) {
-                if (std::find(g_instances.begin(), g_instances.end(), part) ==
-                    g_instances.end()) {
-                    g_instances.push_back(part);
-                }
-            }
-        });
-
-        workspace->ChildRemoved.Connect([](Instance *child) {
-            if (auto *part = dynamic_cast<BasePart *>(child)) {
-                auto it =
-                    std::find(g_instances.begin(), g_instances.end(), part);
-                if (it != g_instances.end()) {
-                    g_instances.erase(it);
-                }
-            }
-        });
-
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         InitWindow(1280, 720, GetWindowTitle());
         SetTargetFPS(60);
@@ -88,6 +69,25 @@ public:
         g_camera.up = Vector3{0.0f, 1.0f, 0.0f};
         g_camera.fovy = 70.0f;
         g_camera.projection = CAMERA_PERSPECTIVE;
+
+        workspace->ChildAdded.Connect([](Instance *child) {
+            if (auto *part = dynamic_cast<BasePart *>(child)) {
+                if (std::find(g_instances.begin(), g_instances.end(), part) ==
+                    g_instances.end()) {
+                    g_instances.push_back(part);
+                }
+            }
+        });
+
+        workspace->ChildRemoved.Connect([](Instance *child) {
+            if (auto *part = dynamic_cast<BasePart *>(child)) {
+                auto it =
+                    std::find(g_instances.begin(), g_instances.end(), part);
+                if (it != g_instances.end()) {
+                    g_instances.erase(it);
+                }
+            }
+        });
 
         MainLoop();
         Cleanup();

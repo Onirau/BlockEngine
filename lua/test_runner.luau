@@ -36,6 +36,14 @@ local function expect(actual)
 			end
             assertsTotal = assertsTotal + 1
 		end,
+		defined = function()
+			if actual == nil then
+				fail("expected defined value, got nil")
+			else
+				-- assertion passed
+			end
+            assertsTotal = assertsTotal + 1
+		end,
 		isA = function(className)
 			if type(actual) == "userdata" and actual:IsA(className) then
 				-- assertion passed

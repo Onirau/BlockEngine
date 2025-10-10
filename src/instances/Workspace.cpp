@@ -44,12 +44,4 @@ void Workspace::Bind(lua_State *L) {
             return 1;
         },
         nullptr); // Read-only for now
-
-    // Create global 'workspace' variable
-    DataModel *dm = DataModel::GetInstance();
-    Workspace *ws = dm->WorkspaceService;
-    if (ws) {
-        LuaClassBinder::PushInstance(L, ws);
-        lua_setglobal(L, "workspace");
-    }
 }

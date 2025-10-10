@@ -7,6 +7,7 @@
 #include "../instances/ModuleScript.h"
 #include "../instances/Part.h"
 #include "../instances/Script.h"
+#include "../instances/ServiceProvider.h"
 #include "../instances/Workspace.h"
 
 #include "LuaClassBinder.h"
@@ -60,6 +61,18 @@ namespace LuaBindings {
 std::vector<BasePart *> *g_instances = nullptr;
 Camera3D *gg_camera = nullptr;
 
+static void CreateGlobalInstances(lua_State *L) {
+    DataModel *dm = DataModel::GetInstance();
+    LuaClassBinder::PushInstance(L, dm);
+    lua_setglobal(L, "game");
+
+    Workspace *ws = dm->WorkspaceService;
+    if (ws) {
+        LuaClassBinder::PushInstance(L, ws);
+        lua_setglobal(L, "workspace");
+    }
+}
+
 int Lua_SetCameraPos(lua_State *L) {
     float x = (float)lua_tonumber(L, 1);
     float y = (float)lua_tonumber(L, 2);
@@ -96,13 +109,19 @@ void RegisterScriptBindings(lua_State *L, std::vector<BasePart *> &parts,
     ModuleScript_Bind(L);       // ModuleScript inherits from LuaSourceContainer
 
     // Register services
-    DataModel::Bind(L); // Creates 'game' global
-    Workspace::Bind(L); // Creates 'workspace' global
+    ServiceProvider::Bind(L); // ServiceProvider inherits from Instance
+    DataModel::Bind(
+        L); // Creates 'game' global (DataModel inherits from ServiceProvider)
+    Workspace::Bind(
+        L); // Creates 'workspace' global (Workspace inherits from Instance)
 
     // Register signals
     Lua_RegisterSignal(L);
 
     // Bind all registered classes and create metatables
     LuaClassBinder::BindAll(L);
+
+    // Create global instances
+    CreateGlobalInstances(L);
 }
 } // namespace LuaBindings
