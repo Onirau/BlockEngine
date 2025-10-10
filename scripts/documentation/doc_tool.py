@@ -120,7 +120,7 @@ class CommentExtractor:
         print(f"\n{'=' * 70}")
         print(f"Extracted {len(self.classes)} classes")
         print(f"API dump written to: {self.output_file}")
-        print(f"\nNext: python doc_system.py generate")
+        print(f"\nNext: python doc_tool.py generate")
     
     def inherit_parent_docs(self):
         for class_name, class_info in self.classes.items():
@@ -699,7 +699,7 @@ def main():
     elif command == "generate":
         if not Path(json_file).exists():
             print(f"Error: {json_file} not found!")
-            print("Run 'python doc_system.py extract' first")
+            print("Run 'python doc_tool.py extract' first")
             sys.exit(1)
         
         generator = HTMLGenerator(json_file, output_dir, templates_dir)
