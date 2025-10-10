@@ -12,6 +12,10 @@ on:
       - "src/**"
       - ".github/workflows/documentation-gen.yml"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-docs:
     runs-on: ubuntu-latest
