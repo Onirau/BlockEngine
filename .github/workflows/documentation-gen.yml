@@ -1,0 +1,46 @@
+﻿name: Generate Docs
+
+on:
+  push:
+    branches: ["*"]
+    paths:
+      - "src/**"
+      - ".github/workflows/documentation-gen.yml"
+  pull_request:
+    branches: ["*"]
+    paths:
+      - "src/**"
+      - ".github/workflows/documentation-gen.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate documentation
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          OUTPUT_DIR=docs/$BRANCH_NAME
+          python scripts/documentation/doc_tool.py all --output $OUTPUT_DIR
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/$BRANCH_NAME
+          publish_branch: gh-pages
+          destination_dir: $BRANCH_NAME
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com

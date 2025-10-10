@@ -4,7 +4,7 @@ Skybox g_skybox;
 
 static int u_inner = -1, u_outer = -1, u_transition = -1;
 
-static const char* SKY_VS = R"(#version 330
+static const char *SKY_VS = R"(#version 330
 in vec3 vertexPosition;
 out vec3 dir;
 uniform mat4 matView;
@@ -21,7 +21,7 @@ void main() {
     gl_Position = matProjection * viewNoTrans * vec4(vertexPosition, 1.0);
 })";
 
-static const char* SKY_FS = R"(#version 330
+static const char *SKY_FS = R"(#version 330
 in vec3 dir;
 out vec4 FragColor;
 uniform vec3 innerColor; // bottom color (ground)

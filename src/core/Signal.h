@@ -1,18 +1,21 @@
 #pragma once
 
+#include <algorithm>
 #include <functional>
-#include <variant>
+#include <memory>
 #include <optional>
-#include <vector>
 #include <string>
+#include <variant>
+#include <vector>
 
+#include "../../luau/Compiler/include/luacode.h"
 #include "../../luau/VM/include/lua.h"
 #include "../../luau/VM/include/lualib.h"
-#include "../../luau/Compiler/include/luacode.h"
 
 struct Instance;
 
-using SignalArg = std::variant<std::monostate, std::string, bool, double, Instance>;
+using SignalArg =
+    std::variant<std::monostate, std::string, bool, double, Instance>;
 
 struct Connection {
     bool Connected = true;
@@ -22,22 +25,19 @@ struct Connection {
 };
 
 struct Signal {
-    lua_State* L = nullptr;
+    lua_State *L = nullptr;
     std::vector<int> LuaConnections; // LUA registry refs
-    std::vector<std::function<void()>> CppConnections; // optional
+    std::vector<std::function<void(Instance *)>> CppConnections;
 
     // Lua
-    void ConnectLua(lua_State* L, int funcIndex);
+    void ConnectLua(lua_State *L, int funcIndex);
 
     // C++
-    void ConnectCpp(const std::function<void()>& cb);
+    void Connect(const std::function<void(Instance *)> &cb);
 
     // Fire
-    void Fire(); // no args
-    void Fire(const std::string& s);
-    void Fire(double n);
-    void Fire(bool b);
-    void Fire(Instance* inst);
+    void Fire(const std::string &s);
+    void Fire(Instance *inst);
 
     void DisconnectAll();
 };
