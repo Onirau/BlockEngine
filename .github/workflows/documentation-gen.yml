@@ -42,9 +42,9 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/$BRANCH_NAME
+          publish_dir: ./docs/${{ env.BRANCH_NAME }}
           publish_branch: gh-pages
-          destination_dir: $BRANCH_NAME
+          destination_dir: ${{ env.BRANCH_NAME }}
           keep_files: true
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
