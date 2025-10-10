@@ -3,7 +3,7 @@
 
 extern Texture2D g_defaultTexture;
 
-static std::unordered_map<PrimitiveShape, Model> g_models;
+static std::unordered_map<PartType, Model> g_models;
 
 void SetMeshTextureCoords(Mesh *mesh, const Vector2 *texcoords) {
     if (!mesh || !texcoords)
@@ -128,22 +128,22 @@ static Mesh GenMeshCornerWedge() {
 void InitPrimitiveModels() {
     Model block = LoadModelFromMesh(GenMeshCube(1.f, 1.f, 1.f));
     Model cylinder = LoadModelFromMesh(GenMeshCylinder(0.5f, 1.f, 16));
-    Model sphere = LoadModelFromMesh(GenMeshSphere(0.5, 16, 16));
+    Model ball = LoadModelFromMesh(GenMeshSphere(0.5, 16, 16));
     Model wedge = LoadModelFromMesh(GenMeshWedge());
     Model cornerWedge = LoadModelFromMesh(GenMeshCornerWedge());
 
     block.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = g_defaultTexture;
     cylinder.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = g_defaultTexture;
-    sphere.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = g_defaultTexture;
+    ball.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = g_defaultTexture;
     wedge.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = g_defaultTexture;
     cornerWedge.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
         g_defaultTexture;
 
-    g_models[PrimitiveShape::Block] = block;
-    g_models[PrimitiveShape::Cylinder] = cylinder;
-    g_models[PrimitiveShape::Sphere] = sphere;
-    g_models[PrimitiveShape::Wedge] = wedge;
-    g_models[PrimitiveShape::CornerWedge] = cornerWedge;
+    g_models[PartType::Block] = block;
+    g_models[PartType::Cylinder] = cylinder;
+    g_models[PartType::Ball] = ball;
+    g_models[PartType::Wedge] = wedge;
+    g_models[PartType::CornerWedge] = cornerWedge;
 }
 
 void UnloadPrimitiveModels() {
@@ -152,7 +152,7 @@ void UnloadPrimitiveModels() {
     g_models.clear();
 }
 
-Model *GetPrimitiveModel(PrimitiveShape shape) {
+Model *GetPrimitiveModel(PartType shape) {
     auto it = g_models.find(shape);
     if (it != g_models.end())
         return &it->second;

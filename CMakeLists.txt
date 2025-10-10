@@ -35,6 +35,7 @@ endif()
 file(GLOB_RECURSE COMMON_SOURCES 
     "src/core/*.cpp"
     "src/datatypes/*.cpp"
+    "src/enums/*.cpp"
     "src/instances/*.cpp"
     "src/Global.cpp"
 )

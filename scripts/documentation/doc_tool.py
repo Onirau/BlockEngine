@@ -49,6 +49,9 @@ class CommentExtractor:
         self.src_dir = Path(src_dir)
         self.output_file = output_file
         self.classes: Dict[str, ClassInfo] = {}
+        self.enums: Dict[str, dict] = {}
+        self.datatypes: Dict[str, ClassInfo] = {}
+        self.type_renames: Dict[str, str] = {}
     
     def extract(self):
         print(f"\nScanning directory: {self.src_dir}")
@@ -61,14 +64,22 @@ class CommentExtractor:
         for file_path in header_files:
             print(f"Processing: {file_path.name}")
             self.process_file(file_path)
+            self.process_enums(file_path)
+            # Capture datatypes even without docblocks from src/datatypes
+            if 'datatypes' in str(file_path.as_posix()):
+                self.process_datatypes(file_path)
         
         print("\nInheriting parent documentation...")
         self.inherit_parent_docs()
+
+        self.apply_type_renames()
         
         api_dump = {
             "Version": 0,
             "Generated": "Auto-Generated",
-            "Classes": []
+            "Classes": [],
+            "Enums": [],
+            "DataTypes": []
         }
         
         for class_info in self.classes.values():
@@ -115,6 +126,52 @@ class CommentExtractor:
         
         api_dump["Classes"].sort(key=lambda c: c["Name"])
         
+        # Enums
+        for enum_name, enum_obj in sorted(self.enums.items(), key=lambda x: x[0]):
+            api_dump["Enums"].append({
+                "Name": enum_name,
+                "Description": enum_obj.get("Description", ""),
+                "Examples": enum_obj.get("Examples", []),
+                "Items": enum_obj.get("Items", [])
+            })
+        
+        # DataTypes
+        for dt in sorted(self.datatypes.values(), key=lambda d: d.name):
+            dt_dict = {
+                "Name": dt.name,
+                "Description": dt.description,
+                "Examples": dt.examples,
+                "SourceFile": dt.source_file,
+                "Members": []
+            }
+            for member in dt.members:
+                member_dict = {
+                    "MemberType": member.member_type,
+                    "Name": member.name,
+                    "Description": member.description,
+                    "Examples": member.examples,
+                    "Deprecated": member.deprecated,
+                    "Internal": member.internal,
+                    "InheritedFrom": member.inherited_from
+                }
+                if member.member_type == "Property":
+                    member_dict["ValueType"] = member.value_type
+                    member_dict["Default"] = member.default_value
+                    member_dict["ReadOnly"] = member.readonly
+                elif member.member_type == "Method":
+                    member_dict["ReturnType"] = member.return_type
+                    member_dict["Parameters"] = [
+                        {"Name": p.name, "Type": p.type, "Description": p.description}
+                        for p in member.parameters
+                    ]
+                elif member.member_type == "Event":
+                    member_dict["Parameters"] = [
+                        {"Name": p.name, "Type": p.type, "Description": p.description}
+                        for p in member.parameters
+                    ]
+                dt_dict["Members"].append(member_dict)
+            api_dump["DataTypes"].append(dt_dict)
+        
         with open(self.output_file, 'w', encoding='utf-8') as f:
             json.dump(api_dump, f, indent=2)
         
@@ -122,6 +179,23 @@ class CommentExtractor:
         print(f"Extracted {len(self.classes)} classes")
         print(f"API dump written to: {self.output_file}")
         print(f"\nNext: python doc_tool.py generate")
+    
+    def apply_type_renames(self):
+        """Apply type renames to all member types and return types"""
+        for class_info in list(self.classes.values()) + list(self.datatypes.values()):
+            for member in class_info.members:
+                # Rename value types
+                if member.value_type in self.type_renames:
+                    member.value_type = self.type_renames[member.value_type]
+                
+                # Rename return types
+                if member.return_type in self.type_renames:
+                    member.return_type = self.type_renames[member.return_type]
+                
+                # Rename parameter types
+                for param in member.parameters:
+                    if param.type in self.type_renames:
+                        param.type = self.type_renames[param.type]
     
     def inherit_parent_docs(self):
         for class_name, class_info in self.classes.items():
@@ -161,19 +235,132 @@ class CommentExtractor:
         
         for match in re.finditer(class_pattern, content, re.DOTALL):
             doc_block = match.group(1)
-            class_name = match.group(2)
+            cpp_class_name = match.group(2)
             parent_name = match.group(3) if match.group(3) else ""
             
-            class_info = self.parse_class_doc(doc_block, class_name, parent_name)
+            class_info = self.parse_class_doc(doc_block, cpp_class_name, parent_name)
             class_info.source_file = str(file_path.relative_to(self.src_dir))
+            class_info.cpp_name = cpp_class_name
             
             class_start = match.end()
             class_body = self.extract_class_body(content, class_start)
             
             self.extract_members(class_body, class_info)
             
-            self.classes[class_name] = class_info
-            print(f"  └─ {class_name}" + (f" : {parent_name}" if parent_name else ""))
+            # Route structs in datatypes to DataTypes
+            key_name = class_info.name
+            if 'datatypes' in str(file_path.as_posix()):
+                self.datatypes[key_name] = class_info
+            else:
+                self.classes[key_name] = class_info
+
+    def process_enums(self, file_path: Path):
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        enum_pattern = r'(?:/\*\*(?P<doc>.*?)\*/\s*)?enum\s+(?:class\s+)?(?P<name>\w+)\s*(?::\s*\w+)?\s*\{(?P<body>[^}]*)\};'
+        for match in re.finditer(enum_pattern, content, re.DOTALL):
+            name = match.group('name')
+            body = match.group('body') or ""
+            doc_text = match.group('doc') or ""
+            enum_desc, enum_examples, item_docs = self.parse_enum_doc(doc_text)
+            items = []
+            value_counter = 0
+            for raw in body.split(','):
+                line = raw.strip()
+                if not line:
+                    continue
+                trailing_desc = ""
+                if '//' in line:
+                    line, trailing = line.split('//', 1)
+                    trailing_desc = trailing.strip()
+                line = re.split(r'/\*', line)[0].strip()
+                if not line:
+                    continue
+                if '=' in line:
+                    parts = line.split('=')
+                    item_name = parts[0].strip()
+                    item_value = parts[1].strip()
+                    try:
+                        value_counter = int(item_value, 0) + 1
+                    except Exception:
+                        value_counter += 1
+                else:
+                    item_name = line.strip()
+                    item_value = str(value_counter)
+                    value_counter += 1
+                desc = item_docs.get(item_name, trailing_desc)
+                items.append({"Name": item_name, "Value": item_value, "Description": desc})
+            if items:
+                self.enums[name] = {
+                    "Description": enum_desc,
+                    "Examples": enum_examples,
+                    "Items": items
+                }
+
+    def parse_enum_doc(self, doc_text: str):
+        description = ""
+        examples: List[str] = []
+        item_docs: Dict[str, str] = {}
+        if not doc_text:
+            return description, examples, item_docs
+        lines = doc_text.split('\n')
+        current_tag = None
+        current_content = []
+        def flush(tag, content):
+            nonlocal description
+            content = content.strip()
+            if tag in ("description", "brief"):
+                description = content
+            elif tag == "example":
+                code_match = re.search(r'```lua\s*(.*?)```', content, re.DOTALL)
+                if code_match:
+                    examples.append(code_match.group(1).strip())
+            elif tag == "item":
+                m = re.match(r'(\w+)\s*-?\s*(.*)', content)
+                if m:
+                    item_docs[m.group(1)] = m.group(2).strip()
+        for line in lines:
+            line = line.strip().lstrip('*').strip()
+            if line.startswith('@'):
+                if current_tag:
+                    flush(current_tag, '\n'.join(current_content))
+                parts = line.split(None, 1)
+                current_tag = parts[0][1:]
+                current_content = [parts[1] if len(parts) > 1 else ""]
+            elif current_tag:
+                current_content.append(line)
+            elif line and not current_tag:
+                description += line + " "
+        if current_tag:
+            flush(current_tag, '\n'.join(current_content))
+        description = description.strip()
+        return description, examples, item_docs
+
+    def process_datatypes(self, file_path: Path):
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+
+        # Find plain struct definitions without requiring a docblock
+        for match in re.finditer(r'\bstruct\s+(\w+)\s*\{', content):
+            name = match.group(1)
+
+            # Skip if already captured as a class
+            if name in self.classes:
+                continue
+
+            mapped_name = self.type_renames.get(name, name)
+            if mapped_name in self.datatypes:
+                continue
+
+            # Extract body
+            start = match.end() - 1
+            body = self.extract_class_body(content, start)
+            ci = ClassInfo(name=name)
+            ci.source_file = str(file_path.relative_to(self.src_dir))
+            if body:
+                self.extract_members(body, ci)
+                
+            self.datatypes[name] = ci
     
     def parse_class_doc(self, doc_text: str, class_name: str, parent_name: str) -> ClassInfo:
         class_info = ClassInfo(name=class_name, superclass=parent_name)
@@ -206,7 +393,15 @@ class CommentExtractor:
     def process_class_tag(self, class_info: ClassInfo, tag: str, content: str):
         content = content.strip()
         
-        if tag == "description" or tag == "brief":
+        if tag == "class":
+            old_name = class_info.name
+            new_name = content
+            class_info.name = new_name
+
+            if old_name != new_name:
+                self.type_renames[old_name] = new_name
+                print(f"  └─ Renaming {old_name} -> {new_name}")
+        elif tag == "description" or tag == "brief":
             class_info.description = content
         elif tag == "example":
             code_match = re.search(r'```lua\s*(.*?)```', content, re.DOTALL)
@@ -412,14 +607,21 @@ class HTMLGenerator:
         
         self.copy_static_files()
         self.build_class_hierarchy()
+        self.build_type_sets()
         
-        print(f"\nGenerating documentation for {len(self.api_data['Classes'])} classes...")
+        print(f"\nGenerating documentation for {len(self.api_data['Classes'])} classes, {len(self.api_data.get('Enums', []))} enums, {len(self.api_data.get('DataTypes', []))} datatypes...")
         
         self.generate_index()
         
         for cls in self.api_data["Classes"]:
             self.generate_class_page(cls)
             print(f"  ✓ {cls['Name']}.html")
+        for enum in self.api_data.get("Enums", []):
+            self.generate_enum_page(enum)
+            print(f"  ✓ {enum['Name']}.html")
+        for dt in self.api_data.get("DataTypes", []):
+            self.generate_datatype_page(dt)
+            print(f"  ✓ {dt['Name']}.html")
         
         print(f"\n{'=' * 70}")
         print(f"Documentation generated!")
@@ -465,6 +667,24 @@ class HTMLGenerator:
         
         return html
     
+    def generate_enum_list_html(self, enums: list, indent=0):
+        html = ""
+        for e in enums:
+            if indent == 0:
+                html += f'                <li><a href="{e["Name"]}.html">{e["Name"]}</a></li>\n                '
+            else:
+                html += f'<li><a href="{e["Name"]}.html">{e["Name"]}</a></li>\n'
+        return html
+    
+    def generate_datatype_list_html(self, dts: list, indent=0):
+        html = ""
+        for d in dts:
+            if indent == 0:
+                html += f'                <li><a href="{d["Name"]}.html">{d["Name"]}</a></li>\n                '
+            else:
+                html += f'<li><a href="{d["Name"]}.html">{d["Name"]}</a></li>\n'
+        return html
+    
     def load_template(self, template_name: str) -> str:
         template_path = self.templates_dir / template_name
         with open(template_path, 'r', encoding='utf-8') as f:
@@ -484,8 +704,12 @@ class HTMLGenerator:
         template = self.load_template("index.html")
         
         class_list = self.generate_class_list_html(self.class_hierarchy)
+        enum_list = self.generate_enum_list_html(self.api_data.get('Enums', [])) if self.api_data.get('Enums') else ""
+        datatype_list = self.generate_datatype_list_html(self.api_data.get('DataTypes', [])) if self.api_data.get('DataTypes') else ""
         
         html = template.replace("{{CLASS_LIST}}", class_list)
+        html = html.replace("{{ENUM_LIST}}", enum_list)
+        html = html.replace("{{DATATYPE_LIST}}", datatype_list)
         
         with open(self.output_dir / "index.html", 'w', encoding='utf-8') as f:
             f.write(html)
@@ -534,6 +758,35 @@ class HTMLGenerator:
         html = html.replace("{{EVENTS_SECTION}}", events_section)
         
         with open(self.output_dir / f"{cls['Name']}.html", 'w', encoding='utf-8') as f:
+            f.write(html)
+
+    def generate_enum_page(self, enum: dict):
+        template = self.load_template("enum.html")
+        items_html = ""
+        for it in enum.get('Items', []):
+            desc = f" - {self.escape_html(it.get('Description',''))}" if it.get('Description') else ""
+            items_html += f"                <li><code>{it['Name']}</code> = <span class=\"type\">{self.escape_html(it['Value'])}</span>{desc}</li>\n"
+        examples_html = ""
+        for ex in enum.get('Examples', []):
+            examples_html += f"            <pre><code class=\"language-lua\">{self.escape_html(ex)}</code></pre>\n"
+        html = template.replace("{{ENUM_NAME}}", enum['Name'])
+        html = html.replace("{{DESCRIPTION}}", enum.get('Description', ''))
+        html = html.replace("{{ENUM_ITEMS}}", items_html)
+        html = html.replace("{{ENUM_EXAMPLES}}", examples_html)
+        with open(self.output_dir / f"{enum['Name']}.html", 'w', encoding='utf-8') as f:
+            f.write(html)
+
+    def generate_datatype_page(self, dt: dict):
+        template = self.load_template("datatype.html")
+        properties = [m for m in dt.get("Members", []) if m["MemberType"] == "Property" and not m.get("Internal")]
+        methods = [m for m in dt.get("Members", []) if m["MemberType"] == "Method" and not m.get("Internal")]
+        properties_section = self.generate_properties_section(properties) if properties else ""
+        methods_section = self.generate_methods_section(methods) if methods else ""
+        html = template.replace("{{DATATYPE_NAME}}", dt['Name'])
+        html = html.replace("{{DESCRIPTION}}", dt.get('Description', ''))
+        html = html.replace("{{PROPERTIES_SECTION}}", properties_section)
+        html = html.replace("{{METHODS_SECTION}}", methods_section)
+        with open(self.output_dir / f"{dt['Name']}.html", 'w', encoding='utf-8') as f:
             f.write(html)
     
     def generate_properties_section(self, properties: list) -> str:
@@ -589,7 +842,7 @@ class HTMLGenerator:
         html = f"""                <div class="member">
                     <div class="member-header">
                         <h3 class="member-name">{prop['Name']}</h3>
-                        <span class="member-type">{prop.get('ValueType', 'Variant')}</span>
+                        <span class="member-type">{self.link_type(prop.get('ValueType', 'Variant'))}</span>
                         {tags_html}
                     </div>
                     <p class="member-description">{prop.get('Description', 'No description available.')}</p>
@@ -605,7 +858,7 @@ class HTMLGenerator:
         return html
     
     def generate_method_html(self, method: dict) -> str:
-        params = ', '.join([f"{p['Name']}: {p['Type']}" for p in method.get('Parameters', [])])
+        params = ', '.join([f"{p['Name']}: {self.link_type(p['Type'])}" for p in method.get('Parameters', [])])
         signature = f"{method['Name']}({params})"
         
         tags = []
@@ -619,7 +872,7 @@ class HTMLGenerator:
         html = f"""                <div class="member">
                     <div class="member-header">
                         <h3 class="member-name">{signature}</h3>
-                        <span class="member-type">{method.get('ReturnType', 'void')}</span>
+                        <span class="member-type">{self.link_type(method.get('ReturnType', 'void'))}</span>
                         {tags_html}
                     </div>
                     <p class="member-description">{method.get('Description', 'No description available.')}</p>
@@ -650,7 +903,7 @@ class HTMLGenerator:
         return html
     
     def generate_event_html(self, event: dict) -> str:
-        params = ', '.join([f"{p['Name']}: {p['Type']}" for p in event.get('Parameters', [])])
+        params = ', '.join([f"{p['Name']}: {self.link_type(p['Type'])}" for p in event.get('Parameters', [])])
         
         tags = []
         if event.get("Deprecated"):
@@ -680,6 +933,24 @@ class HTMLGenerator:
     
     def escape_html(self, text: str) -> str:
         return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+    def build_type_sets(self):
+        self.class_names = set([c['Name'] for c in self.api_data.get('Classes', [])])
+        self.enum_names = set([e['Name'] for e in self.api_data.get('Enums', [])])
+        self.datatype_names = set([d['Name'] for d in self.api_data.get('DataTypes', [])])
+
+    def link_type(self, type_name: str) -> str:
+        if not type_name:
+            return ''
+        simple = type_name.strip()
+        # Handle common mapped types
+        if simple in self.class_names:
+            return f'<a class="type" href="{simple}.html">{simple}</a>'
+        if simple in self.enum_names:
+            return f'<a class="type" href="{simple}.html">{simple}</a>'
+        if simple in self.datatype_names:
+            return f'<a class="type" href="{simple}.html">{simple}</a>'
+        return f'<span class="type">{self.escape_html(simple)}</span>'
 
 
 def main():

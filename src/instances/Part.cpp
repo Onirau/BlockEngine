@@ -1,6 +1,8 @@
 #include "Part.h"
+#include "../core/EnumRegistry.h"
 #include "../core/LuaBindings.h"
 #include "../core/LuaClassBinder.h"
+#include "../enums/PartType.h"
 #include "DataModel.h"
 #include <algorithm>
 
@@ -43,7 +45,62 @@ void Part_Bind(lua_State *L) {
         },
         [](lua_State *L, Instance *inst, int valueIdx) -> int {
             auto *part = static_cast<Part *>(inst);
-            const char *newShape = luaL_checkstring(L, valueIdx);
+            const char *newShape = nullptr;
+
+            // Accept Enum.PartType item
+            const char *enumName = nullptr;
+            const char *itemName = nullptr;
+            int enumValue = -1;
+            if (TryGetEnumItem(L, valueIdx, &enumName, &itemName, &enumValue) &&
+                enumName && strcmp(enumName, "PartType") == 0) {
+                // Map enum numeric to engine shape string
+                switch ((PartType)enumValue) {
+                case PartType::Ball:
+                    newShape = "Sphere";
+                    break;
+                case PartType::Block:
+                    newShape = "Block";
+                    break;
+                case PartType::Cylinder:
+                    newShape = "Cylinder";
+                    break;
+                case PartType::Wedge:
+                    newShape = "Wedge";
+                    break;
+                case PartType::CornerWedge:
+                    newShape = "CornerWedge";
+                    break;
+                default:
+                    newShape = nullptr;
+                    break;
+                }
+            } else if (lua_type(L, valueIdx) == LUA_TNUMBER) {
+                // Accept raw numeric PartType
+                int v = (int)lua_tointeger(L, valueIdx);
+                switch ((PartType)v) {
+                case PartType::Ball:
+                    newShape = "Sphere";
+                    break;
+                case PartType::Block:
+                    newShape = "Block";
+                    break;
+                case PartType::Cylinder:
+                    newShape = "Cylinder";
+                    break;
+                case PartType::Wedge:
+                    newShape = "Wedge";
+                    break;
+                case PartType::CornerWedge:
+                    newShape = "CornerWedge";
+                    break;
+                default:
+                    newShape = nullptr;
+                    break;
+                }
+            } else {
+                // Accept legacy string
+                newShape = luaL_checkstring(L, valueIdx);
+            }
 
             // Validate shape
             bool valid = false;

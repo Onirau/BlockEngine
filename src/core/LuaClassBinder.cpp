@@ -124,8 +124,8 @@ int LuaClassBinder::GenericIndex(lua_State *L) {
 
     // todo: add some kind of lookup
 
-    printf("GenericIndex called: object class='%s', looking for key='%s'\n",
-           inst->ClassName.c_str(), key);
+    // printf("GenericIndex called: object class='%s', looking for key='%s'\n",
+    //        inst->ClassName.c_str(), key);
 
     // Walk up the inheritance chain
     std::string currentClass = inst->ClassName;
@@ -141,15 +141,15 @@ int LuaClassBinder::GenericIndex(lua_State *L) {
             break;
         }
 
-        printf("  Checking class '%s' (has %zu properties, %zu methods)\n",
-               currentClass.c_str(), desc->properties.size(),
-               desc->methods.size());
+        // printf("  Checking class '%s' (has %zu properties, %zu methods)\n",
+        //        currentClass.c_str(), desc->properties.size(),
+        //        desc->methods.size());
 
         // Check properties FIRST
         auto propIt = desc->properties.find(key);
         if (propIt != desc->properties.end()) {
-            printf("  FOUND property '%s' in class '%s'\n", key,
-                   currentClass.c_str());
+            // printf("  FOUND property '%s' in class '%s'\n", key,
+            //        currentClass.c_str());
             if (propIt->second.getter) {
                 return propIt->second.getter(L, inst);
             } else {
@@ -161,8 +161,8 @@ int LuaClassBinder::GenericIndex(lua_State *L) {
         // Check methods
         auto methodIt = desc->methods.find(key);
         if (methodIt != desc->methods.end()) {
-            printf("  FOUND method '%s' in class '%s'\n", key,
-                   currentClass.c_str());
+            // printf("  FOUND method '%s' in class '%s'\n", key,
+            //        currentClass.c_str());
             // Push instance as light userdata
             lua_pushlightuserdata(L, inst);
             // Store method name
@@ -173,8 +173,8 @@ int LuaClassBinder::GenericIndex(lua_State *L) {
         }
 
         currentClass = desc->parentClassName;
-        printf("  Not found in '%s', moving to parent '%s'\n",
-               checked.back().c_str(), currentClass.c_str());
+        // printf("  Not found in '%s', moving to parent '%s'\n",
+        //        checked.back().c_str(), currentClass.c_str());
     }
 
     printf("  Property/method '%s' not found in hierarchy: ", key);

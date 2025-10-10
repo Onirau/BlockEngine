@@ -1,17 +1,10 @@
 #pragma once
+#include "../enums/PartType.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <cstring>
 #include <unordered_map>
 
-enum class PrimitiveShape {
-    Block,
-    Sphere,
-    Cylinder,
-    Wedge,
-    CornerWedge,
-};
-
 void InitPrimitiveModels();
 void UnloadPrimitiveModels();
-Model *GetPrimitiveModel(PrimitiveShape shape);
+Model *GetPrimitiveModel(PartType shape);
