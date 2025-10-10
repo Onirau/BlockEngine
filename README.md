@@ -130,19 +130,19 @@ end
 
 Below is what you can expect for the future in LemonEngine's development! Expect this big list to expand as time goes on!
 
-- [ ] Limiting `os` library
 - [ ] Signals in Lua
 - [x] Instance System
 - [ ] Physics
 - [ ] Data types
   - [ ] CFrame
   - [ ] Random
-  - [ ] game
+  - [X] game
   - [x] workspace
 - [ ] Services
   - [ ] RunService
   - [ ] Lighting
   - [ ] StarterGui
+  - [x] Workspace
 - [ ] Lighting system
   - [ ] Sun lighting
   - [ ] Shadows
