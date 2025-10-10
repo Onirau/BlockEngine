@@ -112,7 +112,7 @@ void ModuleScript_Bind(lua_State *L) {
     lua_pushcfunction(
         L,
         [](lua_State *L) -> int {
-            // Check if argument is a ModuleScript instance
+            // Check if argument is ModuleScript instance
             if (!lua_isuserdata(L, 1)) {
                 luaL_error(L, "require expects a ModuleScript");
                 return 0;
