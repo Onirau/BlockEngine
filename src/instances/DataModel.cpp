@@ -48,7 +48,7 @@ DataModel *DataModel::GetInstance() {
 }
 
 void DataModel::InitializeServices() {
-    // Create and register core services
+    // Register Services
     WorkspaceService = new Workspace();
     RegisterService("Workspace", WorkspaceService);
     WorkspaceService->SetParent(this);
