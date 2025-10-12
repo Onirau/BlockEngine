@@ -18,7 +18,10 @@ endif()
 # Dependencies directory
 set(DEPS_DIR "${CMAKE_SOURCE_DIR}/dependencies")
 
-# Add luau
+# ------------------------------
+# Add dependencies
+
+# Luau
 if(EXISTS "${DEPS_DIR}/luau/CMakeLists.txt")
     add_subdirectory(${DEPS_DIR}/luau)
     set(LUAU_FOUND TRUE)
@@ -26,15 +29,41 @@ else()
     message(FATAL_ERROR "luau not found in dependencies")
 endif()
 
-# Add raylib
-if(EXISTS "${DEPS_DIR}/raylib/CMakeLists.txt")
-    add_subdirectory(${DEPS_DIR}/raylib)
-    set(raylib_FOUND TRUE)
+# GLFW
+if(EXISTS "${DEPS_DIR}/glfw/CMakeLists.txt")
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    add_subdirectory(${DEPS_DIR}/glfw)
+    set(GLFW_FOUND TRUE)
 else()
-    message(FATAL_ERROR "raylib not found in dependencies")
+    message(FATAL_ERROR "GLFW not found in dependencies")
 endif()
 
-# Collect source files
+# BX
+if(EXISTS "${DEPS_DIR}/bx/CMakeLists.txt")
+    add_subdirectory(${DEPS_DIR}/bx)
+else()
+    message(FATAL_ERROR "bx not found in dependencies")
+endif()
+
+# BIMG
+if(EXISTS "${DEPS_DIR}/bimg/CMakeLists.txt")
+    add_subdirectory(${DEPS_DIR}/bimg)
+else()
+    message(FATAL_ERROR "bimg not found in dependencies")
+endif()
+
+# BGFX
+if(EXISTS "${DEPS_DIR}/bgfx/CMakeLists.txt")
+    add_subdirectory(${DEPS_DIR}/bgfx)
+else()
+    message(FATAL_ERROR "bgfx not found in dependencies")
+endif()
+
+# ------------------------------
+# Collect project source files
+
 file(GLOB_RECURSE COMMON_SOURCES 
     "src/core/*.cpp"
     "src/datatypes/*.cpp"
@@ -56,19 +85,34 @@ add_executable(LemonEngineEditor ${EDITOR_SOURCES} ${COMMON_SOURCES})
 file(GLOB RUNTIME_SOURCES "src/runtime/*.cpp")
 add_executable(LemonEngineRuntime ${RUNTIME_SOURCES} ${COMMON_SOURCES})
 
-# Include directories for both executables
+# ------------------------------
+# Include directories & link libraries
+
 foreach(TARGET LemonEngineEditor LemonEngineRuntime)
     target_include_directories(${TARGET} PRIVATE 
+        ${CMAKE_SOURCE_DIR}
         ${DEPS_DIR}/luau/Ast/include
         ${DEPS_DIR}/luau/Config/include
         ${DEPS_DIR}/luau/VM/include
         ${DEPS_DIR}/luau/Compiler/include
         ${DEPS_DIR}/luau/Analysis/include
-        ${CMAKE_SOURCE_DIR}
+        ${DEPS_DIR}/glfw/include
+        ${DEPS_DIR}/bgfx/include
+        ${DEPS_DIR}/bx/include
+        ${DEPS_DIR}/bimg/include
     )
 
     # Link libraries
-    target_link_libraries(${TARGET} PRIVATE raylib Luau.VM Luau.Ast Luau.Compiler)
+    target_link_libraries(${TARGET} PRIVATE 
+        raylib
+        Luau.VM
+        Luau.Ast
+        Luau.Compiler
+        glfw
+        bgfx
+        bimg
+        bx
+    )
 
     # Platform-specific libraries
     if(WIN32)

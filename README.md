@@ -19,7 +19,10 @@ API documentation is available for each branch:
 ## Dependencies
 
 - [Luau](https://github.com/luau-lang/luau)
-- [Raylib](https://github.com/raysan5/raylib)
+- [BGFX](https://github.com/bkaradzic/bgfx)
+- [BX](https://github.com/bkaradzic/bx)
+- [BIMG](https://github.com/bkaradzic/bimg)
+- [GLFW](https://github.com/glfw/glfw)
 
 ## How to Build
 
@@ -32,33 +35,26 @@ API documentation is available for each branch:
    cd LemonEngine
 ```
 
-2. **Clone dependencies**
-
-```bash
-   git clone https://github.com/luau-lang/luau.git dependencies/luau
-   git clone https://github.com/raysan5/raylib.git dependencies/raylib
-```
-
-3. **Install required system libraries**
+2. **Install required system libraries**
 
 ```bash
    sudo apt update
    sudo apt install -y build-essential cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxxf86vm-dev
 ```
 
-4. **Navigate to the build directory**
+3. **Navigate to the build directory**
 
 ```bash
    cd build
 ```
 
-5. **Configure the project**
+4. **Configure the project**
 
 ```bash
    cmake ..
 ```
 
-6. **Build the project**
+5. **Build the project**
    make -j$(nproc)
 
 ---
@@ -69,31 +65,25 @@ API documentation is available for each branch:
    git clone https://github.com/Onirau/LemonEngine.git
    cd LemonEngine
 
-```
-
-2. **Clone dependencies** (temporary; future versions may not require this)
-   git clone https://github.com/luau-lang/luau.git dependencies/luau
-   git clone https://github.com/raysan5/raylib.git dependencies/raylib
-```
-
-3. **Install CMake and Visual Studio**
+2. **Install CMake and Visual Studio**
 
 ````bash
    - Install [CMake](https://cmake.org/download/)
    - Install Visual Studio with "Desktop development with C++" workload
 
-4. **Navigate to build folder**
+3. **Navigate to build folder**
+
 ```bash
    cd build
 ````
 
-5. **Configure the project**
+4. **Configure the project**
 
 ```bash
    cmake ..
 ```
 
-6. **Build the project**
+5. **Build the project**
 
 ```bash
    cmake --build .
@@ -127,9 +117,17 @@ while true do
 end
 ```
 
-# Checklist
+# Checklists
 
 Below is what you can expect for the future in LemonEngine's development! Expect this big list to expand as time goes on!
+
+## Core Checklist
+
+- [ ] Rendering
+- [ ] File System
+- [ ] Audio
+
+## Other Checklist
 
 - [ ] Signals in Lua
 - [x] Instance System
@@ -137,7 +135,7 @@ Below is what you can expect for the future in LemonEngine's development! Expect
 - [ ] Data types
   - [ ] CFrame
   - [ ] Random
-  - [X] game
+  - [x] game
   - [x] workspace
 - [ ] Services
   - [ ] RunService
