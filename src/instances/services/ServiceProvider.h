@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Instance.h"
+#include "../Instance.h"
 #include <memory>
 #include <unordered_map>
 
-#include "../../luau/Compiler/include/luacode.h"
-#include "../../luau/VM/include/lua.h"
-#include "../../luau/VM/include/lualib.h"
+#include <lua.h>
+#include <luacode.h>
+#include <lualib.h>
 
 /**
  * @class ServiceProvider

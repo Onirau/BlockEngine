@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../dependencies/luau/VM/include/lua.h"
+#include <lua.h>
 
 struct LuaPropertyEntry {
     const char *name;

@@ -4,14 +4,7 @@
 #include "raylib.h"
 #include "rlgl.h"
 
-#include "../datatypes/Color3.h"
-#include "../datatypes/Vector3.h"
-
 #include "../instances/BasePart.h"
-#include "../instances/Part.h"
-
-#include "PrimitiveModels.h"
-#include "SkyboxRenderer.h"
 
 extern Texture2D g_defaultTexture;
 

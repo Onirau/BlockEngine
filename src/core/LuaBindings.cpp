@@ -8,8 +8,9 @@
 #include "../instances/ModuleScript.h"
 #include "../instances/Part.h"
 #include "../instances/Script.h"
-#include "../instances/ServiceProvider.h"
-#include "../instances/Workspace.h"
+#include "../instances/services/ServiceProvider.h"
+#include "../instances/services/Workspace.h"
+
 
 #include "LuaClassBinder.h"
 

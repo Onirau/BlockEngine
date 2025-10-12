@@ -1,7 +1,8 @@
 #include "DataModel.h"
 #include "../core/LuaBindings.h"
 #include "../core/LuaClassBinder.h"
-#include "Workspace.h"
+#include "services/Lighting.h"
+#include "services/Workspace.h"
 
 DataModel *DataModel::Instance = nullptr;
 
@@ -32,6 +33,12 @@ DataModel *DataModel::GetInstance() {
         // Cache commonly used services
         WorkspaceService = dynamic_cast<Workspace *>(service);
     }
+
+    if (serviceName == "Lighting") {
+        service = new Lighting();
+        // Cache commonly used services
+        LightingService = dynamic_cast<Lighting *>(service);
+    }
     // Add more services here as needed
     // else if (serviceName == "Players") {
     //     service = new Players();
@@ -45,6 +52,10 @@ void DataModel::InitializeServices() {
     WorkspaceService = new Workspace();
     RegisterService("Workspace", WorkspaceService);
     WorkspaceService->SetParent(this);
+
+    LightingService = new Lighting();
+    RegisterService("Lighting", LightingService);
+    LightingService->SetParent(this);
 }
 
 bool DataModel::IsA(const std::string &className) const {

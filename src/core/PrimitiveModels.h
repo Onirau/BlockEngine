@@ -5,6 +5,6 @@
 #include <cstring>
 #include <unordered_map>
 
-void InitPrimitiveModels();
+void PreparePrimitiveModels();
 void UnloadPrimitiveModels();
 Model *GetPrimitiveModel(PartType shape);

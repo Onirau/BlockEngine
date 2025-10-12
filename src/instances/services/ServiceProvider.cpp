@@ -1,6 +1,5 @@
 #include "ServiceProvider.h"
-#include "../core/LuaBindings.h"
-#include "../core/LuaClassBinder.h"
+#include "../../core/LuaClassBinder.h"
 
 ServiceProvider::ServiceProvider(const std::string &className)
     : Instance(className) {}

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "ServiceProvider.h"
+#include "services/ServiceProvider.h"
 #include <memory>
 
-#include "../../luau/Compiler/include/luacode.h"
-#include "../../luau/VM/include/lua.h"
-#include "../../luau/VM/include/lualib.h"
+#include <lua.h>
+#include <luacode.h>
+#include <lualib.h>
 
 struct Workspace;
+struct Lighting;
 
 /**
  * @class DataModel
@@ -31,6 +32,7 @@ struct DataModel : public ServiceProvider {
     static DataModel *Instance;
 
     Workspace *WorkspaceService = nullptr;
+    Lighting *LightingService = nullptr;
 
     DataModel();
     virtual ~DataModel();

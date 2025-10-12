@@ -1,8 +1,8 @@
 #include "Workspace.h"
-#include "../core/LuaClassBinder.h"
-#include "BasePart.h"
-#include "DataModel.h"
-#include "Part.h"
+#include "../../core/LuaClassBinder.h"
+#include "../BasePart.h"
+#include "../DataModel.h"
+#include "../Part.h"
 #include <cmath>
 
 Workspace::Workspace() : Instance("Workspace") { Name = "Workspace"; }

@@ -1,7 +1,14 @@
 #include "Renderer.h"
 
+#include "../enums/PartType.h"
+#include "../instances/Part.h"
+#include "PrimitiveModels.h"
+#include "SkyboxRenderer.h"
+
 // TODO: add shadows and lights
-const int SHADOW_MAP_SIZE = 1024;
+#define SHADOW_MAP_SIZE 2048
+
+unsigned int depthFBO, depthTex;
 
 Texture2D g_defaultTexture;
 
@@ -48,17 +55,17 @@ void DrawPart(const Part part) {
     Vector3 size = {1, 1, 1};
 
     if (part.Shape == "Block") {
-        model = GetPrimitiveModel(PrimitiveShape::Block);
+        model = GetPrimitiveModel(PartType::Block);
     } else if (part.Shape == "Sphere") {
-        model = GetPrimitiveModel(PrimitiveShape::Sphere);
+        model = GetPrimitiveModel(PartType::Ball);
     } else if (part.Shape == "Cylinder") {
-        model = GetPrimitiveModel(PrimitiveShape::Cylinder);
+        model = GetPrimitiveModel(PartType::Cylinder);
     } else if (part.Shape == "Wedge") {
-        model = GetPrimitiveModel(PrimitiveShape::Wedge);
+        model = GetPrimitiveModel(PartType::Wedge);
     } else if (part.Shape == "CornerWedge") {
-        model = GetPrimitiveModel(PrimitiveShape::CornerWedge);
+        model = GetPrimitiveModel(PartType::CornerWedge);
     } else {
-        model = GetPrimitiveModel(PrimitiveShape::Block);
+        model = GetPrimitiveModel(PartType::Block);
     }
 
     if (model) {
@@ -85,8 +92,11 @@ void RenderScene(Camera3D camera, const std::vector<BasePart *> instances) {
     EndMode3D();
 }
 
+void PrepareShadowMap() {}
+
 void PrepareRenderer() {
     g_defaultTexture = GenerateDefaultTexture();
 
-    InitPrimitiveModels();
+    PrepareShadowMap();
+    PreparePrimitiveModels();
 }

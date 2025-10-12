@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run LemonEngine Editor",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/LemonEngineEditor.exe",
+            "args": ["--run", "lua/test.luau"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build LemonEngine"
+        },
+        {
+            "name": "Test LemonEngine Editor",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "args": ["--test", "--headless"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build LemonEngine"
+        }
+    ]
+}

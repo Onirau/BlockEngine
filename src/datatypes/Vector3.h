@@ -1,12 +1,12 @@
 #pragma once
+#include "raylib.h"
 #include <cmath>
 #include <cstring>
 #include <ostream>
-#include <raylib.h>
 
-#include "../../luau/Compiler/include/luacode.h"
-#include "../../luau/VM/include/lua.h"
-#include "../../luau/VM/include/lualib.h"
+#include <lua.h>
+#include <luacode.h>
+#include <lualib.h>
 
 /**
  * @class Vector3

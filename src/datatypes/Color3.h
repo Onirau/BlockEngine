@@ -3,9 +3,9 @@
 #include <cmath>
 #include <raylib.h>
 
-#include "../../luau/Compiler/include/luacode.h"
-#include "../../luau/VM/include/lua.h"
-#include "../../luau/VM/include/lualib.h"
+#include <lua.h>
+#include <luacode.h>
+#include <lualib.h>
 
 /**
  * @brief Represents a color with RGB components in the range [0, 1]

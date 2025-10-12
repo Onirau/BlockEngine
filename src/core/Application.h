@@ -12,6 +12,8 @@
 #include "raymath.h"
 
 #include "../Global.h"
+#include "PrimitiveModels.h"
+#include "SkyboxRenderer.h"
 
 class Application {
 protected:

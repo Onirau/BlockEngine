@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../luau/VM/include/lua.h"
-#include "../../luau/VM/include/lualib.h"
 #include <functional>
+#include <lua.h>
+#include <lualib.h>
 #include <string>
 #include <unordered_map>
 #include <vector>

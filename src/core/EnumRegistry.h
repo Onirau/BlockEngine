@@ -3,8 +3,8 @@
 #include <functional>
 #include <vector>
 
-#include "../../luau/VM/include/lua.h"
-#include "../../luau/VM/include/lualib.h"
+#include <lua.h>
+#include <lualib.h>
 
 // Function signature for per-enum registration functions
 using EnumRegisterFunc = void (*)(lua_State *L);
@@ -35,10 +35,12 @@ struct EnumEntry {
 };
 
 // Registers a single enum table under Enum.<enumName>
-void RegisterEnum(lua_State *L, const char *enumName,
-                  const EnumEntry *entries /* null-terminated: name==nullptr */);
+void RegisterEnum(
+    lua_State *L, const char *enumName,
+    const EnumEntry *entries /* null-terminated: name==nullptr */);
 
-// Registers Enum.<enumName> from a contiguous names array; values assigned as base+i
+// Registers Enum.<enumName> from a contiguous names array; values assigned as
+// base+i
 void RegisterEnumByNames(lua_State *L, const char *enumName,
                          const char *const *names, int count, int base = 0);
 
@@ -52,13 +54,11 @@ void RegisterEnumByNames(lua_State *L, const char *enumName,
     static void RegisterEnum_##EnumName(lua_State *L) {                        \
         static const EnumEntry kEntries_##EnumName[] = {
 
-#define LUA_ENUM_NUM(Key, NumValue)                                            \
-            {Key, NumValue},
+#define LUA_ENUM_NUM(Key, NumValue) {Key, NumValue},
 
 #define LUA_ENUM_END(EnumName)                                                 \
-            {nullptr, 0}};                                                     \
-        RegisterEnum(L, #EnumName, kEntries_##EnumName);                       \
+            {nullptr, 0}}                                                      \
+    ;                                                                          \
+    RegisterEnum(L, #EnumName, kEntries_##EnumName);                           \
     }                                                                          \
     static EnumRegistrar s_registrar_##EnumName(RegisterEnum_##EnumName);
-
-

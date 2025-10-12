@@ -3,7 +3,6 @@
 #include "../core/LuaClassBinder.h"
 #include "DataModel.h"
 #include "Part.h"
-#include "Workspace.h"
 
 Instance::Instance(const std::string &className)
     : Object(className), Name(className) {}

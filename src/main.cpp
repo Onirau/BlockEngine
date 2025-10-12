@@ -30,7 +30,7 @@ Camera3D g_camera{};
 std::vector<BasePart *> g_instances;
 
 #include "instances/DataModel.h"
-#include "instances/Workspace.h"
+#include "instances/services/Workspace.h"
 
 lua_State *L_main = nullptr;
 

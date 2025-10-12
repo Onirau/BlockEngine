@@ -125,7 +125,7 @@ static Mesh GenMeshCornerWedge() {
     return mesh;
 }
 
-void InitPrimitiveModels() {
+void PreparePrimitiveModels() {
     Model block = LoadModelFromMesh(GenMeshCube(1.f, 1.f, 1.f));
     Model cylinder = LoadModelFromMesh(GenMeshCylinder(0.5f, 1.f, 16));
     Model ball = LoadModelFromMesh(GenMeshSphere(0.5, 16, 16));

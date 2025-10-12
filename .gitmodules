@@ -1,0 +1,4 @@
+[submodule "dependencies/luau"]
+	path = dependencies/luau
+	url = https://github.com/luau-lang/luau.git
+    ignore = dirty

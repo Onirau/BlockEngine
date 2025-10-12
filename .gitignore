@@ -1,15 +1,16 @@
 # Build
 build/*
 !build/.gitkeep
+compile_commands.json
 
 # Dependencies
 dependencies/*
 !dependencies/.gitkeep
 
+dependencies/luau/*
+!dependencies/luau/.git
+
 # Locally Generated Documentation
 scripts/documentation/api-dump.json
 docs/*
 !docs/.gitkeep
-
-# IDE
-.vscode/
