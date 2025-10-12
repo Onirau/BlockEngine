@@ -3,21 +3,6 @@
 	url = https://github.com/luau-lang/luau.git
     ignore = dirty
 
-[submodule "dependencies/bgfx"]
-	path = dependencies/bgfx
-	url = https://github.com/bkaradzic/bgfx.git
-    ignore = dirty
-
-[submodule "dependencies/bx"]
-	path = dependencies/bx
-	url = https://github.com/bkaradzic/bx.git
-    ignore = dirty
-
-[submodule "dependencies/bimg"]
-	path = dependencies/bimg
-	url = https://github.com/bkaradzic/bimg.git
-    ignore = dirty
-
 [submodule "dependencies/glfw"]
 	path = dependencies/glfw
 	url = https://github.com/glfw/glfw.git
