@@ -50,8 +50,9 @@ public:
         Initialize();
 
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+        SetConfigFlags(FLAG_VSYNC_HINT);
         InitWindow(1280, 720, GetWindowTitle());
-        SetTargetFPS(60);
+        SetTargetFPS(0);
 
         L_main = luaL_newstate();
         luaL_openlibs(L_main);

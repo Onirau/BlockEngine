@@ -4,7 +4,6 @@
 #include "../../datatypes/Vector3.h"
 #include "../Instance.h"
 
-
 #include <lua.h>
 #include <luacode.h>
 #include <lualib.h>
@@ -50,7 +49,7 @@ struct Lighting : public Instance {
      * @default 0.0
      * @description The time of day in hours (0-24), used for sun position
      */
-    float ClockTime = 0.0f;
+    float ClockTime = 9.0f;
 
     Lighting();
     virtual ~Lighting() = default;

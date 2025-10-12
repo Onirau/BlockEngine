@@ -28,6 +28,7 @@ Vector3Game Lighting::GetSunDirection() const {
     float y = std::sin(elevation);
     float z = std::cos(elevation) * std::sin(azimuth);
 
+    // Color3 ambientColor = lighting->Ambient;
     // Normalize the vector
     Vector3Game direction(x, y, z);
     float length = std::sqrt(x * x + y * y + z * z);

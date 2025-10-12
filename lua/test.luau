@@ -1,20 +1,65 @@
 local lighting = game:GetService("Lighting")
 print(lighting:GetSunDirection())
 
--- -- can we make parts
--- local part1 = Instance.new("Part")
--- part1.Color = Color3.new(0,0,1)
--- part1.Position = Vector3.new(0, 2.5, 0)
--- part1.Size = Vector3.one * 2
--- part1.Shape = Enum.PartType.CornerWedge
--- part1.Parent = workspace
+local baseplate = Instance.new("Part");
+baseplate.Color = Color3.new(0.35,0.35,0.35)
+baseplate.Position = Vector3.new(0, -8, 0)
+baseplate.Size = Vector3.new(2048, 16, 2048)
+baseplate.Name = "Baseplate"
+baseplate.Parent = workspace
 
--- local part2 = Instance.new("Part")
--- part2.Color = Color3.new(0,1,0)
--- part2.Position = Vector3.new(2.5, 2.5, 0)
--- part2.Size = Vector3.one * 2
--- part2.Shape = Enum.PartType.Block
--- part2.Parent = part1
+-- -- can we make parts
+local spacing = 0
+do
+    local part = Instance.new("Part")
+    part.Color = Color3.new(0,0,1)
+    part.Position = Vector3.new(spacing, 2.5, 0)
+    part.Size = Vector3.one * 2
+    part.Shape = Enum.PartType.Block
+    part.Parent = workspace
+    spacing += 2.5
+end
+
+do
+    local part = Instance.new("Part")
+    part.Color = Color3.new(0,0,1)
+    part.Position = Vector3.new(spacing, 2.5, 0)
+    part.Size = Vector3.one * 2
+    part.Shape = Enum.PartType.Ball
+    part.Parent = workspace
+    spacing += 2.5
+end
+
+do
+    local part = Instance.new("Part")
+    part.Color = Color3.new(0,0,1)
+    part.Position = Vector3.new(spacing, 1.5, 0) -- TODO: gotta fix cylinder mesh
+    part.Size = Vector3.one * 2
+    part.Shape = Enum.PartType.Cylinder
+    part.Parent = workspace
+    spacing += 2.5
+end
+
+do
+    local part = Instance.new("Part")
+    part.Color = Color3.new(0,0,1)
+    part.Position = Vector3.new(spacing, 2.5, 0)
+    part.Size = Vector3.one * 2
+    part.Shape = Enum.PartType.Wedge
+    part.Parent = workspace
+    spacing += 2.5
+end
+
+do
+    local part = Instance.new("Part")
+    part.Color = Color3.new(0,0,1)
+    part.Position = Vector3.new(spacing, 2.5, 0)
+    part.Size = Vector3.one * 2
+    part.Shape = Enum.PartType.CornerWedge
+    part.Parent = workspace
+    spacing += 2.5
+end
+
 
 -- -- try making a lua source
 -- local script = Instance.new("Script")

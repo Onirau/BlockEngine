@@ -11,7 +11,6 @@
 #include "../instances/services/ServiceProvider.h"
 #include "../instances/services/Workspace.h"
 
-
 #include "LuaClassBinder.h"
 
 // Legacy signal binding (keep for now)
@@ -115,10 +114,9 @@ void RegisterScriptBindings(lua_State *L, std::vector<BasePart *> &parts,
 
     // Register services
     ServiceProvider::Bind(L); // ServiceProvider inherits from Instance
-    DataModel::Bind(
-        L); // Creates 'game' global (DataModel inherits from ServiceProvider)
-    Workspace::Bind(
-        L); // Creates 'workspace' global (Workspace inherits from Instance)
+    DataModel::Bind(L);
+    Workspace::Bind(L);
+    Lighting::Bind(L);
 
     // Register signals
     Lua_RegisterSignal(L);
