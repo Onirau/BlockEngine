@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+            <h2>On This Page</h2>
+            <ul class="toc">
+                <li><a href="#properties">Properties</a></li>
+                <li><a href="#methods">Methods</a></li>
+                <li><a href="#events">Events</a></li>
+
+            </ul>
+        </nav>
+    </div>
+    
+    <main class="content">
+        <header class="class-header">
+            <h1>Object</h1>
+
+        </header>
+        
+        <section class="description">
+            <p>Object is the base class for all engine objects.
+
+All classes in the engine inherit from Object.</p>
+        </section>
+
+
+
+        <section id="properties" class="api-section">
+            <h2>Properties</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">ClassName</h3>
+                        <span class="member-type"><span class="type">string</span></span>
+                        <span class="tag readonly">Read-only</span>
+                    </div>
+                    <p class="member-description">The name of this object's class</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Name</h3>
+                        <span class="member-type"><span class="type">string</span></span>
+                        
+                    </div>
+                    <p class="member-description">The name of this object</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="methods" class="api-section">
+            <h2>Methods</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">IsA(className: <span class="type">string</span>)</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        
+                    </div>
+                    <p class="member-description">Checks if this object is an instance of the specified class</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>className</code> <span class="type">string</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">FirePropertyChanged(propertyName: <span class="type">string</span>)</h3>
+                        <span class="member-type"><span class="type">void</span></span>
+                        
+                    </div>
+                    <p class="member-description">Triggers the Changed event for a specific property</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>propertyName</code> <span class="type">string</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="events" class="api-section">
+            <h2>Events</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Changed</h3>
+                        <span class="member-type">Event(propertyName: <span class="type">string</span>)</span>
+                        
+                    </div>
+                    <p class="member-description">Fires when a property of this object changes</p>
+                    <pre><code class="language-lua">part.Changed:Connect(function(property)
+print("Property changed:", property)
+end)</code></pre>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+</body>
+</html>

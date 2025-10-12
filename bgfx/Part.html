@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+            <h2>On This Page</h2>
+            <ul class="toc">
+                <li><a href="#properties">Properties</a></li>
+                <li><a href="#methods">Methods</a></li>
+                <li><a href="#events">Events</a></li>
+
+            </ul>
+        </nav>
+    </div>
+    
+    <main class="content">
+        <header class="class-header">
+            <h1>Part</h1>
+            <p class="inheritance">Inherits <a href="BasePart.html">BasePart</a></p>
+
+        </header>
+        
+        <section class="description">
+            <p>Part is the most basic building block in LemonEngine. It represents a
+physical object.</p>
+        </section>
+
+        <section class="examples">
+            <h2>Examples</h2>
+            <pre><code class="language-lua">-- Create a platform
+local platform = Instance.new("Part")
+platform.Size = Vector3.new(20, 1, 20)
+platform.Position = Vector3.new(0, 0, 0)
+platform.Anchored = true
+platform.Parent = workspace</code></pre>
+        </section>
+
+
+        <section id="properties" class="api-section">
+            <h2>Properties</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Position</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The 3D position of the part in world space</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Rotation</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The rotation angles in degrees (X, Y, Z)</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Size</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The dimensions of the part</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Velocity</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The current velocity of the part</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">RotationVelocity</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The angular velocity of the part</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Anchored</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">When true, the part is not affected by physics</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">CanCollide</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">When true, the part can collide with other parts</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">CanQuery</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">When true, the part can be detected by raycasts</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">CanTouch</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">When true, the part can trigger touch events</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Mass</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        <span class="tag readonly">Read-only</span> <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The mass of the part calculated from size and material</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Color</h3>
+                        <span class="member-type"><a class="type" href="Color3.html">Color3</a></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The color of the part</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">CastShadow</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">When true, the part casts shadows</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Transparency</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">The transparency of the part from 0 (opaque) to 1
+(invisible)</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="methods" class="api-section">
+            <h2>Methods</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">GetMass()</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">Returns the calculated mass of the part</p>
+                    <pre><code class="language-lua">local mass = part:GetMass()
+print("Mass:", mass)</code></pre>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="events" class="api-section">
+            <h2>Events</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Touched</h3>
+                        <span class="member-type">Event(otherPart: <a class="type" href="BasePart.html">BasePart</a>)</span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">Fires when another part touches this part</p>
+                    <pre><code class="language-lua">part.Touched:Connect(function(otherPart)
+print("Touched by:", otherPart.Name)
+end)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">TouchEnded</h3>
+                        <span class="member-type">Event(otherPart: <a class="type" href="BasePart.html">BasePart</a>)</span>
+                        <span class="tag inherited">Inherited from <a href="BasePart.html">BasePart</a></span>
+                    </div>
+                    <p class="member-description">Fires when another part stops touching this part</p>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+</body>
+</html>

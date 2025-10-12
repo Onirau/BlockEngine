@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color3 - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+        </nav>
+    </div>
+    <main class="content">
+        <header class="class-header">
+            <h1>Color3</h1>
+        </header>
+        <section class="description">
+            <p>Color3 is a datatype used for working with colors. Each
+component (red, green, blue) is stored as a floating-point value between 0
+and 1, where 0 represents no intensity and 1 represents full intensity.</p>
+        </section>
+        <section id="properties" class="api-section">
+            <h2>Properties</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">r</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        <span class="tag readonly">Read-only</span>
+                    </div>
+                    <p class="member-description">The red component of the color (0-1)</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">g</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        <span class="tag readonly">Read-only</span>
+                    </div>
+                    <p class="member-description">The green component of the color (0-1)</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">b</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        <span class="tag readonly">Read-only</span>
+                    </div>
+                    <p class="member-description">The blue component of the color (0-1)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="methods" class="api-section">
+            <h2>Methods</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">fromRGB(r: <span class="type">number</span>, g: <span class="type">number</span>, b: <span class="type">number</span>)</h3>
+                        <span class="member-type"><a class="type" href="Color3.html">Color3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Creates a Color3 from RGB values in the range 0-255</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>r</code> <span class="type">number</span> - Red component (0-255)</li>
+                            <li><code>g</code> <span class="type">number</span> - Green component (0-255)</li>
+                            <li><code>b</code> <span class="type">number</span> - Blue component (0-255)</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local orange = Color3.fromRGB(255, 165, 0)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">fromHSV(h: <span class="type">number</span>, s: <span class="type">number</span>, v: <span class="type">number</span>)</h3>
+                        <span class="member-type"><a class="type" href="Color3.html">Color3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Creates a Color3 from HSV (Hue, Saturation, Value) color
+space</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>h</code> <span class="type">number</span> - Hue (0-1)</li>
+                            <li><code>s</code> <span class="type">number</span> - Saturation (0-1)</li>
+                            <li><code>v</code> <span class="type">number</span> - Value/Brightness (0-1)</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">-- Create a bright green
+local green = Color3.fromHSV(0.333, 1, 1)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Lerp(other: <a class="type" href="Color3.html">Color3</a>, alpha: <span class="type">number</span>)</h3>
+                        <span class="member-type"><a class="type" href="Color3.html">Color3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns a Color3 linearly interpolated between this color
+and the target color</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>other</code> <span class="type">Color3</span> - The target color to interpolate towards</li>
+                            <li><code>alpha</code> <span class="type">number</span> - The interpolation factor (0-1)</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local red = Color3.new(1, 0, 0)
+local blue = Color3.new(0, 0, 1)
+local purple = red:Lerp(blue, 0.5)</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>
+
+
+
+
+

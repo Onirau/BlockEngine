@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataModel - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+            <h2>On This Page</h2>
+            <ul class="toc">
+                <li><a href="#methods">Methods</a></li>
+
+            </ul>
+        </nav>
+    </div>
+    
+    <main class="content">
+        <header class="class-header">
+            <h1>DataModel</h1>
+            <p class="inheritance">Inherits <a href="ServiceProvider.html">ServiceProvider</a></p>
+
+        </header>
+        
+        <section class="description">
+            <p>DataModel represents the top-level container in the instance hierarchy.
+It inherits from ServiceProvider and manages all game services like
+Workspace. Typically accessed via the global `game` variable in Lua.</p>
+        </section>
+
+        <section class="examples">
+            <h2>Examples</h2>
+            <pre><code class="language-lua">local workspace = game:GetService("Workspace")
+local part = Instance.new("Part")
+part.Parent = workspace</code></pre>
+        </section>
+
+
+
+
+        <section id="methods" class="api-section">
+            <h2>Methods</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">GetService(serviceName: <span class="type">string</span>)</h3>
+                        <span class="member-type"><a class="type" href="Instance.html">Instance</a></span>
+                        <span class="tag inherited">Inherited from <a href="ServiceProvider.html">ServiceProvider</a></span>
+                    </div>
+                    <p class="member-description">Gets a service by name, creating it if it doesn't exist</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>serviceName</code> <span class="type">string</span></li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local workspace = game:GetService("Workspace")</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">FindService(serviceName: <span class="type">string</span>)</h3>
+                        <span class="member-type"><span class="type">Instance | nil</span></span>
+                        <span class="tag inherited">Inherited from <a href="ServiceProvider.html">ServiceProvider</a></span>
+                    </div>
+                    <p class="member-description">Finds a service by name without creating it</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>serviceName</code> <span class="type">string</span></li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local workspace = game:FindService("Workspace")
+if workspace then
+print("Workspace exists")
+end</code></pre>
+                </div>
+            </div>
+        </section>
+
+
+
+
+    </main>
+</body>
+</html>

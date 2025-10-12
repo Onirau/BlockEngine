@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PartType - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+        </nav>
+    </div>
+    <main class="content">
+        <header class="class-header">
+            <h1>PartType</h1>
+        </header>
+        <section class="description">
+            <p>PartType defines the geometric shape of a Part. Each type has
+different collision properties and visual appearance.</p>
+        </section>
+        <section class="api-section">
+            <h2>Items</h2>
+            <ul class="nav-list">
+                <li><code>Ball</code> = <span class="type">0</span></li>
+                <li><code>Block</code> = <span class="type">1</span></li>
+                <li><code>Cylinder</code> = <span class="type">2</span></li>
+                <li><code>Wedge</code> = <span class="type">3</span></li>
+                <li><code>CornerWedge</code> = <span class="type">4</span></li>
+
+            </ul>
+        </section>
+        <section class="examples">
+            <h2>Examples</h2>
+            <pre><code class="language-lua">local part = Instance.new("Part")
+part.Shape = Enum.PartType.Ball
+
+-- Check part type
+if part.Shape == Enum.PartType.Block then
+print("This is a block")
+end</code></pre>
+
+        </section>
+    </main>
+</body>
+</html>
+
+

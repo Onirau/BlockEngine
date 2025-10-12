@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector3 - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+        </nav>
+    </div>
+    <main class="content">
+        <header class="class-header">
+            <h1>Vector3</h1>
+        </header>
+        <section class="description">
+            <p>Vector3 is a fundamental datatype for representing positions,
+directions, and sizes in 3D space. It supports common vector operations
+including arithmetic, magnitude calculation, normalization, and
+interpolation.</p>
+        </section>
+        <section id="properties" class="api-section">
+            <h2>Properties</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">X</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The x-coordinate of the vector</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Y</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The y-coordinate of the vector</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Z</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The z-coordinate of the vector</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="methods" class="api-section">
+            <h2>Methods</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Magnitude()</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The length of the vector</p>
+                    <pre><code class="language-lua">local vec = Vector3.new(3, 4, 0)
+print(vec.Magnitude) -- 5</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Unit()</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">A normalized copy of the vector with magnitude of 1</p>
+                    <pre><code class="language-lua">local vec = Vector3.new(10, 0, 0)
+local unit = vec.Unit
+print(unit.Magnitude) -- 1</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Abs()</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns a Vector3 with the absolute value of each component</p>
+                    <pre><code class="language-lua">local vec = Vector3.new(-5, -10, 3)
+local abs = vec:Abs() -- Vector3(5, 10, 3)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Ceil()</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns a Vector3 with each component rounded up to the
+nearest integer</p>
+                    <pre><code class="language-lua">local vec = Vector3.new(1.2, 2.7, 3.1)
+local ceiled = vec:Ceil() -- Vector3(2, 3, 4)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Floor()</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns a Vector3 with each component rounded down to the
+nearest integer</p>
+                    <pre><code class="language-lua">local vec = Vector3.new(1.8, 2.3, 3.9)
+local floored = vec:Floor() -- Vector3(1, 2, 3)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Dot(v: <a class="type" href="Vector3.html">Vector3</a>)</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">Returns the dot product of this vector and another vector</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>v</code> <span class="type">Vector3</span> - The other vector</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local a = Vector3.new(1, 0, 0)
+local b = Vector3.new(0, 1, 0)
+print(a:Dot(b)) -- 0 (perpendicular)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Cross(v: <a class="type" href="Vector3.html">Vector3</a>)</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns the cross product of this vector and another vector</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>v</code> <span class="type">Vector3</span> - The other vector</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local a = Vector3.xAxis
+local b = Vector3.yAxis
+local cross = a:Cross(b) -- Returns Vector3.zAxis</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Lerp(goal: <a class="type" href="Vector3.html">Vector3</a>, alpha: <span class="type">number</span>)</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns a Vector3 linearly interpolated between this vector
+and the goal</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>goal</code> <span class="type">Vector3</span> - The target vector to interpolate towards</li>
+                            <li><code>alpha</code> <span class="type">number</span> - The interpolation factor (0-1)</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local start = Vector3.new(0, 0, 0)
+local finish = Vector3.new(10, 10, 10)
+local mid = start:Lerp(finish, 0.5) -- Vector3(5, 5, 5)</code></pre>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">FuzzyEq(v: <a class="type" href="Vector3.html">Vector3</a>)</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        
+                    </div>
+                    <p class="member-description">Returns true if the magnitudes of both vectors are
+approximately equal within epsilon</p>
+                    <div class="parameters">
+                        <h4>Parameters:</h4>
+                        <ul>
+                            <li><code>v</code> <span class="type">Vector3</span> - The other vector to compare</li>
+                        </ul>
+                    </div>
+                    <pre><code class="language-lua">local a = Vector3.new(1, 0, 0)
+local b = Vector3.new(0.99999, 0, 0)
+print(a:FuzzyEq(b)) -- true</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModuleScript - LemonEngine API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>LemonEngine</h1>
+            <p class="version">v0.0.0</p>
+        </div>
+        <nav>
+            <a href="index.html" class="back-link">← Back to Index</a>
+            <h2>On This Page</h2>
+            <ul class="toc">
+                <li><a href="#properties">Properties</a></li>
+                <li><a href="#methods">Methods</a></li>
+
+            </ul>
+        </nav>
+    </div>
+    
+    <main class="content">
+        <header class="class-header">
+            <h1>ModuleScript</h1>
+            <p class="inheritance">Inherits <a href="LuaSourceContainer.html">LuaSourceContainer</a></p>
+
+        </header>
+        
+        <section class="description">
+            <p>ModuleScript contains Lua code that returns a value
+which can be required by other scripts.</p>
+        </section>
+
+        <section class="examples">
+            <h2>Examples</h2>
+            <pre><code class="language-lua">-- In ModuleScript
+local module = {}
+function module.greet(name)
+return "Hello, " .. name
+end
+return module
+
+-- In another Script
+local myModule = require(script.Parent.ModuleScript)
+print(myModule.greet("World"))</code></pre>
+        </section>
+
+
+        <section id="properties" class="api-section">
+            <h2>Properties</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">ModuleRef</h3>
+                        <span class="member-type"><span class="type">int</span></span>
+                        
+                    </div>
+                    <p class="member-description">Reference to the cached module value in the Lua registry</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Loaded</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        
+                    </div>
+                    <p class="member-description">Whether the module has been loaded and cached</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Enabled</h3>
+                        <span class="member-type"><span class="type">bool</span></span>
+                        <span class="tag inherited">Inherited from <a href="LuaSourceContainer.html">LuaSourceContainer</a></span>
+                    </div>
+                    <p class="member-description">When true, the script can execute; when appropriate.</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Source</h3>
+                        <span class="member-type"><span class="type">string</span></span>
+                        <span class="tag inherited">Inherited from <a href="LuaSourceContainer.html">LuaSourceContainer</a></span>
+                    </div>
+                    <p class="member-description">The Lua source code to execute.</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">SourcePath</h3>
+                        <span class="member-type"><span class="type">string</span></span>
+                        <span class="tag inherited">Inherited from <a href="LuaSourceContainer.html">LuaSourceContainer</a></span>
+                    </div>
+                    <p class="member-description">File path to fetch and load source code from.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="methods" class="api-section">
+            <h2>Methods</h2>
+            <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Require()</h3>
+                        <span class="member-type"><span class="type">int</span></span>
+                        
+                    </div>
+                    <p class="member-description">Loads and returns the module value</p>
+                    <pre><code class="language-lua">local module = require(game.ServerScriptService.MyModule)</code></pre>
+                </div>
+            </div>
+        </section>
+
+
+
+
+    </main>
+</body>
+</html>
