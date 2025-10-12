@@ -8,8 +8,7 @@
 #include <luacode.h>
 #include <lualib.h>
 
-#include "raylib.h"
-#include "raymath.h"
+#include <bx/math.h>
 
 #include "../Global.h"
 #include "PrimitiveModels.h"

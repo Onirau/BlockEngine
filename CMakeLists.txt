@@ -40,20 +40,6 @@ else()
     message(FATAL_ERROR "GLFW not found in dependencies")
 endif()
 
-# BX
-if(EXISTS "${DEPS_DIR}/bx/CMakeLists.txt")
-    add_subdirectory(${DEPS_DIR}/bx)
-else()
-    message(FATAL_ERROR "bx not found in dependencies")
-endif()
-
-# BIMG
-if(EXISTS "${DEPS_DIR}/bimg/CMakeLists.txt")
-    add_subdirectory(${DEPS_DIR}/bimg)
-else()
-    message(FATAL_ERROR "bimg not found in dependencies")
-endif()
-
 # BGFX
 if(EXISTS "${DEPS_DIR}/bgfx/CMakeLists.txt")
     add_subdirectory(${DEPS_DIR}/bgfx)
