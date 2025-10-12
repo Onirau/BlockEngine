@@ -42,6 +42,31 @@
             <div class="member-list">
                 <div class="member">
                     <div class="member-header">
+                        <h3 class="member-name">Brightness</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The overall brightness multiplier for lighting</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">GeographicLatitude</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The geographic latitude used for sun position calculations
+(in degrees)</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">ClockTime</h3>
+                        <span class="member-type"><span class="type">number</span></span>
+                        
+                    </div>
+                    <p class="member-description">The time of day in hours (0-24), used for sun position</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
                         <h3 class="member-name">Parent</h3>
                         <span class="member-type"><span class="type">Instance | nil</span></span>
                         <span class="tag inherited">Inherited from <a href="Instance.html">Instance</a></span>
@@ -79,6 +104,22 @@
         <section id="methods" class="api-section">
             <h2>Methods</h2>
             <div class="member-list">
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">Ambient()</h3>
+                        <span class="member-type"><span class="type">void</span></span>
+                        
+                    </div>
+                    <p class="member-description">The ambient light color applied to all surfaces</p>
+                </div>
+                <div class="member">
+                    <div class="member-header">
+                        <h3 class="member-name">GetSunDirection()</h3>
+                        <span class="member-type"><a class="type" href="Vector3.html">Vector3</a></span>
+                        
+                    </div>
+                    <p class="member-description">Returns the direction vector of the sun.</p>
+                </div>
                 <div class="member">
                     <div class="member-header">
                         <h3 class="member-name">AddTag(tag: <span class="type">string</span>)</h3>
