@@ -4,11 +4,13 @@
   ],
   "cmake.configureOnOpen": true,
   "cmake.buildDirectory": "build",
-  "files.exclude": {
-      "**/dependencies/luau": true
-  },
   "search.exclude": {
-      "**/dependencies/luau": true
+      "**/dependencies/luau": true,
+      "**/dependencies/bgfx": true,
+      "**/dependencies/bx": true,
+      "**/dependencies/bimg": true,
+      "**/dependencies/glfw": true,
+      "**/build": true,
   },
   "git.ignoredRepositories": [
       "${workspaceFolder}/dependencies/luau"

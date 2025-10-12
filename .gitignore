@@ -10,6 +10,18 @@ dependencies/*
 dependencies/luau/*
 !dependencies/luau/.git
 
+dependencies/bgfx/*
+!dependencies/bgfx/.git
+
+dependencies/bx/*
+!dependencies/bx/.git
+
+dependencies/bimg/*
+!dependencies/bimg/.git
+
+dependencies/glfw/*
+!dependencies/glfw/.git
+
 # Locally Generated Documentation
 scripts/documentation/api-dump.json
 docs/*
