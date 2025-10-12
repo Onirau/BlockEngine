@@ -11,3 +11,6 @@
 [submodule "dependencies/bgfx.cmake"]
 	path = dependencies/bgfx.cmake
 	url = https://github.com/widberg/bgfx.cmake.git
+[submodule "dependencies/glm"]
+	path = dependencies/glm
+	url = https://github.com/g-truc/glm.git
