@@ -7,9 +7,7 @@
 	path = dependencies/glfw
 	url = https://github.com/glfw/glfw.git
     ignore = dirty
-[submodule "dependencies/bgfx"]
-	path = dependencies/bgfx
-	url = https://github.com/widberg/bgfx.cmake.git
+	
 [submodule "dependencies/bgfx.cmake"]
 	path = dependencies/bgfx.cmake
 	url = https://github.com/widberg/bgfx.cmake.git
