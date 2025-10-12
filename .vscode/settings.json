@@ -13,7 +13,9 @@
       "**/build": true,
   },
   "git.ignoredRepositories": [
-      "${workspaceFolder}/dependencies/luau"
+      "${workspaceFolder}/dependencies/luau",
+      "${workspaceFolder}/dependencies/bgfx.cmake",
+      "${workspaceFolder}/dependencies/glfw"
   ],
   "files.associations": {
     "*.acompute": "glsl",

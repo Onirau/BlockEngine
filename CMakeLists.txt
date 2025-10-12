@@ -41,16 +41,16 @@ else()
 endif()
 
 # BGFX
-if(EXISTS "${DEPS_DIR}/bgfx/CMakeLists.txt")
-    add_subdirectory(${DEPS_DIR}/bgfx)
+if(EXISTS "${DEPS_DIR}/bgfx.cmake/CMakeLists.txt")
+    add_subdirectory(${DEPS_DIR}/bgfx.cmake)
 else()
-    message(FATAL_ERROR "bgfx not found in dependencies")
+    message(FATAL_ERROR "bgfx.cmake not found in dependencies")
 endif()
 
 # ------------------------------
 # Collect project source files
 
-file(GLOB_RECURSE COMMON_SOURCES 
+file(GLOB_RECURSE COMMON_SOURCES
     "src/core/*.cpp"
     "src/datatypes/*.cpp"
     "src/enums/*.cpp"
@@ -75,7 +75,7 @@ add_executable(LemonEngineRuntime ${RUNTIME_SOURCES} ${COMMON_SOURCES})
 # Include directories & link libraries
 
 foreach(TARGET LemonEngineEditor LemonEngineRuntime)
-    target_include_directories(${TARGET} PRIVATE 
+    target_include_directories(${TARGET} PRIVATE
         ${CMAKE_SOURCE_DIR}
         ${DEPS_DIR}/luau/Ast/include
         ${DEPS_DIR}/luau/Config/include
@@ -83,14 +83,14 @@ foreach(TARGET LemonEngineEditor LemonEngineRuntime)
         ${DEPS_DIR}/luau/Compiler/include
         ${DEPS_DIR}/luau/Analysis/include
         ${DEPS_DIR}/glfw/include
-        ${DEPS_DIR}/bgfx/include
-        ${DEPS_DIR}/bx/include
-        ${DEPS_DIR}/bimg/include
+        ${DEPS_DIR}/bgfx.cmake/bgfx/include
+        ${DEPS_DIR}/bgfx.cmake/bx/include
+        ${DEPS_DIR}/bgfx.cmake/bimg/include
+        ${DEPS_DIR}/glm
     )
-
+    
     # Link libraries
-    target_link_libraries(${TARGET} PRIVATE 
-        raylib
+    target_link_libraries(${TARGET} PRIVATE
         Luau.VM
         Luau.Ast
         Luau.Compiler
@@ -99,7 +99,7 @@ foreach(TARGET LemonEngineEditor LemonEngineRuntime)
         bimg
         bx
     )
-
+    
     # Platform-specific libraries
     if(WIN32)
         target_link_libraries(${TARGET} PRIVATE

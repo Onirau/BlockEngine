@@ -15,15 +15,16 @@ int Task_RunScript(lua_State *L, std::string &scriptText) {
     lua_State *thread = task.thread;
 
     // Prepare per-script environment and pass it to luau_load
-    lua_newtable(thread);              // env
-    lua_newtable(thread);              // mt
+    lua_newtable(thread);                    // env
+    lua_newtable(thread);                    // mt
     lua_pushvalue(thread, LUA_GLOBALSINDEX); // _G
     lua_setfield(thread, -2, "__index");
-    lua_setmetatable(thread, -2);      // setmetatable(env, mt)
+    lua_setmetatable(thread, -2); // setmetatable(env, mt)
 
     int envIndex = lua_gettop(thread);
-    int loadStatus = luau_load(thread, "ScriptChunk", bytecode, bcSize, envIndex);
-    lua_remove(thread, envIndex);      // remove env, keep function
+    int loadStatus =
+        luau_load(thread, "ScriptChunk", bytecode, bcSize, envIndex);
+    lua_remove(thread, envIndex); // remove env, keep function
     if (loadStatus != LUA_OK) {
         const char *err = lua_tostring(thread, -1);
         printf("Error loading script: %s\n", err);
@@ -31,7 +32,7 @@ int Task_RunScript(lua_State *L, std::string &scriptText) {
         return 0;
     }
 
-    task.WakeTime = GetTime();
+    task.WakeTime = glfwGetTime();
     g_tasks.push_back(std::move(task));
 
     return 1;
@@ -51,7 +52,7 @@ static int Task_Spawn(lua_State *L) {
 
 static int Task_Wait(lua_State *L) {
     double delay = luaL_optnumber(L, 1, 0.0);
-    double now = GetTime();
+    double now = glfwGetTime();
 
     for (auto &task : g_tasks) {
         if (task.thread == L) {
@@ -66,7 +67,7 @@ static int Task_Wait(lua_State *L) {
 }
 
 void TaskScheduler_Step() {
-    double now = GetTime();
+    double now = glfwGetTime();
 
     for (auto &task : g_tasks) {
         if (task.Finished)

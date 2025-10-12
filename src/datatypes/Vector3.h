@@ -1,8 +1,11 @@
 #pragma once
-#include "raylib.h"
+
 #include <cmath>
 #include <cstring>
 #include <ostream>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/epsilon.hpp>
 
 #include <lua.h>
 #include <luacode.h>
@@ -66,8 +69,11 @@ struct Vector3Game {
         z = Z;
     }
 
-    ::Vector3 toRaylib() { return {x, y, z}; }
-    Vector3Game fromRaylib(Vector3 v3) { return {v3.x, v3.y, v3.z}; }
+    // Convert to GLM vector
+    glm::vec3 toGLM() const { return glm::vec3(x, y, z); }
+
+    // Create from GLM vector
+    static Vector3Game fromGLM(const glm::vec3 &v) { return {v.x, v.y, v.z}; }
 
     Vector3Game operator+(const Vector3Game &v) const {
         return {x + v.x, y + v.y, z + v.z};
@@ -134,9 +140,7 @@ struct Vector3Game {
      * local ceiled = vec:Ceil() -- Vector3(2, 3, 4)
      * ```
      */
-    Vector3Game ceil() const {
-        return {float(int(x + 1)), float(int(y + 1)), float(int(z + 1))};
-    }
+    Vector3Game ceil() const { return {ceilf(x), ceilf(y), ceilf(z)}; }
 
     /**
      * @method Floor
@@ -149,9 +153,7 @@ struct Vector3Game {
      * local floored = vec:Floor() -- Vector3(1, 2, 3)
      * ```
      */
-    Vector3Game floor() const {
-        return {float(int(x)), float(int(y)), float(int(z))};
-    }
+    Vector3Game floor() const { return {floorf(x), floorf(y), floorf(z)}; }
 
     /**
      * @method Dot
@@ -217,7 +219,7 @@ struct Vector3Game {
      * ```
      */
     bool fuzzyequal(const Vector3Game &v, float epsilon = 1e-5) const {
-        return fabsf(magnitude()) - fabsf(v.magnitude()) < epsilon;
+        return fabsf(magnitude() - v.magnitude()) < epsilon;
     }
 };
 

@@ -60,7 +60,7 @@ void Lua_RegisterSignal(lua_State *L) {
 
 namespace LuaBindings {
 std::vector<BasePart *> *g_instances = nullptr;
-Camera3D *gg_camera = nullptr;
+Camera *gg_camera = nullptr;
 
 static void CreateGlobalInstances(lua_State *L) {
     DataModel *dm = DataModel::GetInstance();
@@ -85,7 +85,7 @@ int Lua_SetCameraPos(lua_State *L) {
 }
 
 void RegisterScriptBindings(lua_State *L, std::vector<BasePart *> &parts,
-                            Camera3D &g_camera) {
+                            Camera &g_camera) {
     g_instances = &parts;
     gg_camera = &g_camera;
 

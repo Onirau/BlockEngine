@@ -1,18 +1,23 @@
 #pragma once
-#include <vector>
 
-#include "raylib.h"
-#include "rlgl.h"
-
+#include "../Global.h"
 #include "../instances/BasePart.h"
+#include "Texture2D.h"
+#include <bgfx/bgfx.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 
 extern Texture2D g_defaultTexture;
 
-Texture2D GenerateDefaultTexture(int width = 128, int height = 128);
+Texture2D GenerateDefaultTexture(int width = 256, int height = 256);
 
-Matrix GetLightSpaceMatrix(const Vector3 &lightDir, const Vector3 &sceneCenter);
+glm::mat4 GetLightSpaceMatrix(const glm::vec3 &lightDir,
+                              const glm::vec3 &sceneCenter);
+
 void RenderShadowMap(const std::vector<BasePart *> &instances,
-                     const Vector3 &lightDir, const Vector3 &sceneCenter);
+                     const glm::vec3 &lightDir, const glm::vec3 &sceneCenter);
 void PrepareRenderer();
-void RenderScene(Camera3D g_camera, std::vector<BasePart *> g_instances);
+void RenderScene(const Camera &camera,
+                 const std::vector<BasePart *> &instances);
 void UnprepareRenderer();

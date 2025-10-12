@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../../Global.h"
 #include "../../datatypes/Vector3.h"
 #include "../Instance.h"
+
 
 #include <lua.h>
 #include <luacode.h>
@@ -33,7 +35,7 @@ struct Workspace : public Instance {
      * @type Camera | nil
      * @description The active camera for rendering the Workspace
      */
-    Camera3D *CurrentCamera = nullptr;
+    Camera *CurrentCamera = nullptr;
 
     Workspace();
     virtual ~Workspace() = default;

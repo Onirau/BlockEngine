@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "raylib.h"
-#include "raymath.h"
+#include <GLFW/glfw3.h>
 
 #include <lua.h>
 #include <luacode.h>

@@ -18,7 +18,7 @@
             "label": "Build LemonEngine",
             "type": "shell",
             "command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat\" && cmake --build build",
-            // "dependsOn": ["Configure CMake"],
+            "dependsOn": ["Configure CMake"],
             "options": {
                 "shell": {
                     "executable": "cmd.exe",

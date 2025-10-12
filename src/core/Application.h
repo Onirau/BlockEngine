@@ -4,11 +4,24 @@
 #include <filesystem>
 #include <vector>
 
+#include <GLFW/glfw3.h>
+#if defined(_WIN32)
+#define GLFW_EXPOSE_NATIVE_WIN32
+#elif defined(__linux__)
+#define GLFW_EXPOSE_NATIVE_X11
+#endif
+#include <GLFW/glfw3native.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <bgfx/bgfx.h>
+#include <bgfx/platform.h>
+
 #include <lua.h>
 #include <luacode.h>
 #include <lualib.h>
-
-#include <bx/math.h>
 
 #include "../Global.h"
 #include "PrimitiveModels.h"
@@ -16,14 +29,20 @@
 
 class Application {
 protected:
+    GLFWwindow *window = nullptr;
     bool rotatingCamera = false;
     bool warpThisFrame = false;
-    Vector2 anchorPos = {0, 0};
-    Vector3 worldUp = {0, 1, 0};
+    glm::vec2 anchorPos = {0, 0};
+    glm::vec3 worldUp = {0, 1, 0};
     float gYaw = 0.0f;
     float gPitch = 0.0f;
     DataModel *dataModel = nullptr;
     Workspace *workspace = nullptr;
+
+    int windowWidth = 1280;
+    int windowHeight = 720;
+    double lastTime = 0.0;
+    double deltaTime = 0.0;
 
     virtual void RenderUI() = 0;
     virtual void Initialize() = 0;
@@ -41,36 +60,80 @@ public:
         UnloadPrimitiveModels();
         g_instances.clear();
         UnloadSkybox();
-        CloseWindow();
+
+        if (window) {
+            bgfx::shutdown();
+            glfwDestroyWindow(window);
+            glfwTerminate();
+        }
+
         lua_close(L_main);
     }
 
     void Run() {
         Initialize();
 
-        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-        SetConfigFlags(FLAG_VSYNC_HINT);
-        InitWindow(1280, 720, GetWindowTitle());
-        SetTargetFPS(0);
+        if (!glfwInit()) {
+            return;
+        }
+
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+        window = glfwCreateWindow(windowWidth, windowHeight, GetWindowTitle(),
+                                  nullptr, nullptr);
+        if (!window) {
+            glfwTerminate();
+            return;
+        }
+
+        // Setup bgfx
+        bgfx::Init init;
+        init.type = bgfx::RendererType::Direct3D11;
+
+#if defined(_WIN32)
+        init.platformData.nwh = glfwGetWin32Window(window);
+#elif defined(__linux__)
+        init.platformData.ndt = glfwGetX11Display();
+        init.platformData.nwh = (void *)(uintptr_t)glfwGetX11Window(window);
+#endif
+
+        glfwGetWindowSize(window, &windowWidth, &windowHeight);
+        init.resolution.width = windowWidth;
+        init.resolution.height = windowHeight;
+        init.resolution.reset = BGFX_RESET_VSYNC;
+
+        if (!bgfx::init(init)) {
+            glfwDestroyWindow(window);
+            glfwTerminate();
+            return;
+        }
+
+        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xffffffff,
+                           1.0f, 0);
+        bgfx::setViewRect(0, 0, 0, windowWidth, windowHeight);
+
+        // Setup callbacks
+        glfwSetWindowUserPointer(window, this);
+        glfwSetMouseButtonCallback(window, MouseButtonCallback);
+        glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
         L_main = luaL_newstate();
         luaL_openlibs(L_main);
 
         LuaBindings::RegisterScriptBindings(L_main, g_instances, g_camera);
 
-        // Call post-Lua initialization hook
         PostLuaInitialize();
 
         PrepareRenderer();
-        LoadSkybox();
+        // LoadSkybox();
 
         // Initialize camera
         g_camera = {};
-        g_camera.position = Vector3{0, 2, -5};
-        g_camera.target = Vector3{0, 2, 0};
-        g_camera.up = Vector3{0.0f, 1.0f, 0.0f};
-        g_camera.fovy = 70.0f;
-        g_camera.projection = CAMERA_PERSPECTIVE;
+        g_camera.position = glm::vec3{0, 2, -5};
+        g_camera.target = glm::vec3{0, 2, 0};
+        g_camera.up = glm::vec3{0.0f, 1.0f, 0.0f};
+        g_camera.fov = 70.0f;
 
         workspace->ChildAdded.Connect([](Instance *child) {
             if (auto *part = dynamic_cast<BasePart *>(child)) {
@@ -91,6 +154,7 @@ public:
             }
         });
 
+        lastTime = glfwGetTime();
         MainLoop();
         Cleanup();
     }
@@ -99,79 +163,117 @@ protected:
     virtual const char *GetWindowTitle() const = 0;
 
 private:
+    static void MouseButtonCallback(GLFWwindow *win, int button, int action,
+                                    int mods) {
+        Application *app =
+            static_cast<Application *>(glfwGetWindowUserPointer(win));
+        if (!app)
+            return;
+
+        if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            if (action == GLFW_PRESS) {
+                double x, y;
+                glfwGetCursorPos(win, &x, &y);
+                app->anchorPos = glm::vec2(x, y);
+                app->rotatingCamera = true;
+            } else if (action == GLFW_RELEASE) {
+                app->rotatingCamera = false;
+            }
+        }
+    }
+
+    static void FramebufferSizeCallback(GLFWwindow *win, int width,
+                                        int height) {
+        Application *app =
+            static_cast<Application *>(glfwGetWindowUserPointer(win));
+        if (!app)
+            return;
+
+        app->windowWidth = width;
+        app->windowHeight = height;
+        bgfx::reset(width, height, BGFX_RESET_VSYNC);
+        bgfx::setViewRect(0, 0, 0, width, height);
+    }
+
     void MainLoop() {
-        while (!WindowShouldClose()) {
-            const double deltaTime = GetFrameTime();
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+
+            double currentTime = glfwGetTime();
+            deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
             float moveSpeed = 25.0f * static_cast<float>(deltaTime);
 
-            if (IsKeyDown(KEY_LEFT_SHIFT)) {
-                moveSpeed *= 0.25;
-            }
-
-            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-                anchorPos = GetMousePosition();
-                rotatingCamera = true;
-            }
-            if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                rotatingCamera = false;
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+                moveSpeed *= 0.25f;
             }
 
             if (rotatingCamera) {
                 if (!warpThisFrame) {
-                    Vector2 delta =
-                        Vector2Subtract(GetMousePosition(), anchorPos);
+                    double mx, my;
+                    glfwGetCursorPos(window, &mx, &my);
+                    glm::vec2 mousePos(mx, my);
+                    glm::vec2 delta = mousePos - anchorPos;
+
                     gYaw += delta.x * 0.004f;
                     gPitch += -delta.y * 0.004f;
 
-                    const float limit = PI / 2 - 0.01f;
-                    if (gPitch > limit)
-                        gPitch = limit;
-                    if (gPitch < -limit)
-                        gPitch = -limit;
+                    const float limit = glm::pi<float>() / 2.0f - 0.01f;
+                    gPitch = glm::clamp(gPitch, -limit, limit);
                 } else {
-                    SetMousePosition((int)anchorPos.x, (int)anchorPos.y);
+                    glfwSetCursorPos(window, anchorPos.x, anchorPos.y);
                 }
                 warpThisFrame = !warpThisFrame;
             }
 
-            Vector3 forward = {cosf(gPitch) * cosf(gYaw), sinf(gPitch),
-                               cosf(gPitch) * sinf(gYaw)};
+            glm::vec3 forward = {cosf(gPitch) * cosf(gYaw), sinf(gPitch),
+                                 cosf(gPitch) * sinf(gYaw)};
 
-            Vector3 right = Vector3CrossProduct(worldUp, forward);
-            if (Vector3LengthSqr(right) < 1e-6f)
-                right = Vector3{1, 0, 0};
-            right = Vector3Normalize(right);
+            glm::vec3 right = glm::cross(worldUp, forward);
+            if (glm::dot(right, right) < 1e-6f) {
+                right = glm::vec3(1, 0, 0);
+            }
+            right = glm::normalize(right);
 
-            Vector3 up = Vector3CrossProduct(forward, right);
+            glm::vec3 up = glm::cross(forward, right);
 
-            Vector3 delta = {0, 0, 0};
-            if (IsKeyDown(KEY_W))
-                delta = Vector3Add(delta, Vector3Scale(forward, moveSpeed));
-            if (IsKeyDown(KEY_S))
-                delta =
-                    Vector3Subtract(delta, Vector3Scale(forward, moveSpeed));
-            if (IsKeyDown(KEY_D))
-                delta = Vector3Subtract(delta, Vector3Scale(right, moveSpeed));
-            if (IsKeyDown(KEY_A))
-                delta = Vector3Add(delta, Vector3Scale(right, moveSpeed));
-            if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_E))
-                delta = Vector3Add(delta, Vector3Scale(up, moveSpeed));
-            if (IsKeyDown(KEY_Q))
-                delta = Vector3Subtract(delta, Vector3Scale(up, moveSpeed));
+            glm::vec3 delta(0, 0, 0);
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+                delta += forward * moveSpeed;
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+                delta -= forward * moveSpeed;
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+                delta -= right * moveSpeed;
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+                delta += right * moveSpeed;
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ||
+                glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+                delta += up * moveSpeed;
+            if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+                delta -= up * moveSpeed;
 
-            g_camera.position = Vector3Add(g_camera.position, delta);
-            g_camera.target = Vector3Add(g_camera.position, forward);
+            g_camera.position += delta;
+            g_camera.target = g_camera.position + forward;
             g_camera.up = up;
 
             TaskScheduler_Step();
 
-            BeginDrawing();
-            ClearBackground(RAYWHITE);
+            // Set view and projection matrices
+            glm::mat4 view =
+                glm::lookAt(g_camera.position, g_camera.target, g_camera.up);
+            glm::mat4 proj = glm::perspective(
+                glm::radians(g_camera.fov),
+                (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
 
-            RenderScene(g_camera, g_instances);
+            bgfx::setViewTransform(0, glm::value_ptr(view),
+                                   glm::value_ptr(proj));
+            bgfx::touch(0);
+
+            // RenderScene(g_camera, g_instances);
             RenderUI();
 
-            EndDrawing();
+            bgfx::frame();
         }
     }
 };

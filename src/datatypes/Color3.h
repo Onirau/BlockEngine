@@ -1,7 +1,6 @@
 #pragma once
 #include <algorithm>
 #include <cmath>
-#include <raylib.h>
 
 #include <lua.h>
 #include <luacode.h>
@@ -56,10 +55,6 @@ struct Color3 {
     Color3(float red, float green, float blue)
         : r(std::clamp(red, 0.0f, 1.0f)), g(std::clamp(green, 0.0f, 1.0f)),
           b(std::clamp(blue, 0.0f, 1.0f)) {}
-
-    Color3(Color rayColor)
-        : r((float)rayColor.r / 255.f), g((float)rayColor.g / 255.f),
-          b((float)rayColor.b / 255.f) {}
 
     /**
      * @method fromRGB
