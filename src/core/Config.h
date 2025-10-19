@@ -1,8 +1,10 @@
 #pragma once
 
 // Engine Information
+// we use these in serialisation to identify and verify the engine/runtime used is right
 #define ENGINE_NAME "LemonEngine"
-#define ENGINE_VERSION_MAJOR 0
+#define ENGINE_HEADER "LEMON" // must be 5 bytes
+#define ENGINE_VERSION_MAJOR 0 
 #define ENGINE_VERSION_MINOR 1
 #define ENGINE_VERSION_PATCH 0
 #define ENGINE_VERSION_STRING "0.1.0"

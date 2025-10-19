@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "ShaderCompiler.h"
 
 #define SHADOW_MAP_SIZE 2048
 
@@ -41,20 +42,21 @@ static Color Color3ToColor(const Color3 &c) {
 }
 
 // Helper to load shader from file
-static bgfx::ShaderHandle loadShader(const char *filename) {
-    FILE *file = fopen(filename, "rb");
-    if (!file)
-        return BGFX_INVALID_HANDLE;
+static bgfx::ShaderHandle loadShader(const enum shaderc::ShaderType type, const char *vs_src) {
+    // FILE *file = fopen(filename, "rb");
+    // if (!file)
+    //     return BGFX_INVALID_HANDLE;
 
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    // fseek(file, 0, SEEK_END);
+    // long size = ftell(file);
+    // fseek(file, 0, SEEK_SET);
 
-    const bgfx::Memory *mem = bgfx::alloc(size + 1);
-    fread(mem->data, 1, size, file);
-    mem->data[size] = '\0';
-    fclose(file);
+    // const bgfx::Memory *mem = bgfx::alloc(size + 1);
+    // fread(mem->data, 1, size, file);
+    // mem->data[size] = '\0';
+    // fclose(file);
 
+    const bgfx::Memory* mem = shaderc::compileShader(type, vs_src, "", "varying.def.sc");
     return bgfx::createShader(mem);
 }
 
@@ -310,8 +312,8 @@ void PrepareRenderer() {
     // bgfx::ShaderHandle fsh = loadShader("shaders/shadow_fs.bin");
     // shadowProgram = bgfx::createProgram(vsh, fsh, true);
 
-    bgfx::ShaderHandle mainVsh = loadShader("shaders/main_vs.bin");
-    bgfx::ShaderHandle mainFsh = loadShader("shaders/main_fs.bin");
+    bgfx::ShaderHandle mainVsh = loadShader(shaderc::ShaderType::ST_VERTEX, "shaders/main_vs.bin");
+    bgfx::ShaderHandle mainFsh = loadShader(shaderc::ShaderType::ST_FRAGMENT, "shaders/main_fs.bin");
 
     if (!bgfx::isValid(mainVsh) || !bgfx::isValid(mainFsh)) {
         printf("ERROR: Failed to load main shaders\n");

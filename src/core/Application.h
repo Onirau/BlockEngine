@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bgfx/defines.h"
 #include <cmath>
 #include <filesystem>
 #include <vector>
@@ -108,6 +109,9 @@ public:
             glfwTerminate();
             return;
         }
+
+        // TEMP
+        bgfx::setDebug(BGFX_DEBUG_STATS);
 
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xffffffff,
                            1.0f, 0);
